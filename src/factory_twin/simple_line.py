@@ -20,6 +20,7 @@ def simulate_line(minutes, arrival_rate, process_time):
     queue = 0
     completed = 0
     queue_lengths = []
+    max_queue = 0
 
     for minute in range(minutes):
         queue += arrival_rate
@@ -28,6 +29,7 @@ def simulate_line(minutes, arrival_rate, process_time):
             queue -= 1
             completed += 1
 
+        max_queue = max(max_queue, queue)
         queue_lengths.append(queue)
 
     average_queue = sum(queue_lengths) / len(queue_lengths) if queue_lengths else 0
@@ -37,6 +39,7 @@ def simulate_line(minutes, arrival_rate, process_time):
         "completed": completed,
         "throughput_per_hour": throughput_per_hour,
         "average_queue_length": average_queue,
+        "max_queue_length": max_queue
     }
 
 

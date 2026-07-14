@@ -20,3 +20,9 @@ def test_throughput_scales_to_hour():
 def test_invalid_process_time_raises_error():
     with pytest.raises(ValueError):
         simulate_line(60, 1, 0)
+
+
+def test_simulate_line_tracks_max_queue_length():
+    metrics = simulate_line(60, 1, 3)
+    assert metrics["max_queue_length"] == 40
+
