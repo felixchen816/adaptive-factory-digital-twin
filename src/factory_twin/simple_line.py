@@ -41,8 +41,8 @@ def simulate_line(minutes, arrival_rate, process_time):
         "completed": completed,
         "throughput_per_hour": throughput_per_hour,
         "average_queue_length": average_queue,
-        "max_queue_length": max_queue
-        ,"utilization": utilization
+        "max_queue_length": max_queue,
+        "utilization": utilization
     }
 
 
@@ -51,3 +51,5 @@ if __name__ == "__main__":
     print("completed:", metrics["completed"])
     print("throughput_per_hour:", metrics["throughput_per_hour"])
     print("average_queue_length:", metrics["average_queue_length"])
+    print("max_queue_length:", metrics["max_queue_length"])
+    print("utilization:", metrics["utilization"])
