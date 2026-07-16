@@ -34,12 +34,15 @@ def simulate_line(minutes, arrival_rate, process_time):
 
     average_queue = sum(queue_lengths) / len(queue_lengths) if queue_lengths else 0
     throughput_per_hour = completed * 60 / minutes if minutes else 0
+    busy_minutes = min(completed * process_time, minutes)
+    utilization = busy_minutes / minutes if minutes else 0
 
     return {
         "completed": completed,
         "throughput_per_hour": throughput_per_hour,
         "average_queue_length": average_queue,
         "max_queue_length": max_queue
+        ,"utilization": utilization
     }
 
 

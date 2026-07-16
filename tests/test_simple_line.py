@@ -26,3 +26,8 @@ def test_simulate_line_tracks_max_queue_length():
     metrics = simulate_line(60, 1, 3)
     assert metrics["max_queue_length"] == 40
 
+
+def test_simulate_line_tracks_utilization():
+    metrics = simulate_line(60, 1, 3)
+    assert metrics["utilization"] == 1.0
+
