@@ -8,7 +8,7 @@ def simulate_line(minutes, arrival_rate, process_time):
         process_time: Minutes between processing each part.
 
     Returns:
-        Dictionary with completed parts, hourly throughput, and average queue length.
+        Dictionary with completed parts, queue metrics, throughput, and utilization.
     """
     if minutes < 0:
         raise ValueError("minutes must be non-negative")
@@ -21,6 +21,7 @@ def simulate_line(minutes, arrival_rate, process_time):
     completed = 0
     queue_lengths = []
     max_queue = 0
+    initial_queue = queue
 
     for minute in range(minutes):
         queue += arrival_rate
@@ -36,13 +37,15 @@ def simulate_line(minutes, arrival_rate, process_time):
     throughput_per_hour = completed * 60 / minutes if minutes else 0
     busy_minutes = min(completed * process_time, minutes)
     utilization = busy_minutes / minutes if minutes else 0
+    queue_growth_rate = queue - initial_queue
 
     return {
         "completed": completed,
         "throughput_per_hour": throughput_per_hour,
         "average_queue_length": average_queue,
         "max_queue_length": max_queue,
-        "utilization": utilization
+        "utilization": utilization,
+        "queue_growth_rate": queue_growth_rate,
     }
 
 
@@ -53,3 +56,4 @@ if __name__ == "__main__":
     print("average_queue_length:", metrics["average_queue_length"])
     print("max_queue_length:", metrics["max_queue_length"])
     print("utilization:", metrics["utilization"])
+    print("queue_growth_rate:", metrics["queue_growth_rate"])

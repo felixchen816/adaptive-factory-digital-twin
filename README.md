@@ -25,9 +25,43 @@ The simulator currently reports:
 - `average_queue_length`: average number of waiting parts over time
 - `max_queue_length`: largest queue size reached during the run
 - `utilization`: estimated fraction of simulated time the machine is busy
+- `queue_growth_rate`: final queue length minus initial queue length, showing
+  whether backlog is building up
 
 ## Run the Demo
 
 ```bash
 PYTHONPATH=src python -m factory_twin.simple_line
 ```
+
+Example output:
+
+```text
+completed: 20
+throughput_per_hour: 20.0
+average_queue_length: 20.0
+max_queue_length: 40
+utilization: 1.0
+queue_growth_rate: 40
+```
+
+## Run Tests
+
+```bash
+PYTHONPATH=src pytest
+```
+
+## Why This Project Matters
+
+Factory systems are not just about making one machine faster. Throughput depends
+on arrivals, processing time, queues, capacity, utilization, and bottlenecks
+across the whole system. This project is a small first step toward modeling
+those interactions with code.
+
+## Next Milestones
+
+- Add configurable machines, buffers, part types, and routes.
+- Export simulation metrics to CSV.
+- Add bottleneck detection.
+- Add charts for throughput, utilization, and queue length.
+- Compare before/after scenarios for process improvements.
