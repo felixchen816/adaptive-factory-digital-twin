@@ -45,6 +45,25 @@ utilization: 1.0
 queue_growth_rate: 40
 ```
 
+## Run Scenario Comparison
+
+```bash
+PYTHONPATH=src python examples/run_simple_line.py
+```
+
+The scenario comparison runs the same one-machine model under three operating
+conditions:
+
+- `balanced line`: one part arrives each minute and the machine processes one
+  part each minute
+- `overloaded line`: one part arrives each minute and the machine processes one
+  part every three minutes
+- `faster machine`: one part arrives each minute and the machine processes one
+  part every two minutes
+
+This makes it easier to compare how processing speed affects completed parts,
+throughput, queue size, utilization, and backlog growth.
+
 ## Run Tests
 
 ```bash
