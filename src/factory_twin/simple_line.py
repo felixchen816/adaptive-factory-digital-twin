@@ -1,3 +1,4 @@
+from factory_twin.machine import Machine
 from factory_twin.scenario import Scenario
 
 
@@ -58,6 +59,10 @@ def simulate_scenario(scenario: Scenario):
         scenario.arrival_rate,
         scenario.process_time,
     )
+
+
+def simulate_machine_line(minutes, arrival_rate, machine: Machine):
+    return simulate_line(minutes, arrival_rate, machine.process_time)
 
 
 if __name__ == "__main__":

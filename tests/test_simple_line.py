@@ -1,7 +1,9 @@
 import pytest
 
+from factory_twin.machine import Machine
 from factory_twin.scenario import Scenario
 from factory_twin.simple_line import simulate_line
+from factory_twin.simple_line import simulate_machine_line
 from factory_twin.simple_line import simulate_scenario
 
 
@@ -62,3 +64,21 @@ def test_simulate_scenario_matches_simulate_line():
     )
 
     assert simulate_scenario(scenario) == simulate_line(60, 1, 3)
+
+
+def test_machine_stores_name_and_process_time():
+    machine = Machine(name="press", process_time=3)
+
+    assert machine.name == "press"
+    assert machine.process_time == 3
+
+
+def test_machine_rejects_invalid_process_time():
+    with pytest.raises(ValueError):
+        Machine(name="press", process_time=0)
+
+
+def test_simulate_machine_line_matches_simulate_line():
+    machine = Machine(name="press", process_time=3)
+
+    assert simulate_machine_line(60, 1, machine) == simulate_line(60, 1, 3)
