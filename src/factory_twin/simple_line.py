@@ -1,3 +1,6 @@
+from factory_twin.scenario import Scenario
+
+
 def simulate_line(minutes, arrival_rate, process_time):
     """
     Simulate a one-machine production line.
@@ -49,8 +52,23 @@ def simulate_line(minutes, arrival_rate, process_time):
     }
 
 
+def simulate_scenario(scenario: Scenario):
+    return simulate_line(
+        scenario.minutes,
+        scenario.arrival_rate,
+        scenario.process_time,
+    )
+
+
 if __name__ == "__main__":
-    metrics = simulate_line(60, 1, 3)
+    metrics = simulate_scenario(
+        Scenario(
+            name="overloaded line",
+            minutes=60,
+            arrival_rate=1,
+            process_time=3,
+        )
+    )
     print("completed:", metrics["completed"])
     print("throughput_per_hour:", metrics["throughput_per_hour"])
     print("average_queue_length:", metrics["average_queue_length"])

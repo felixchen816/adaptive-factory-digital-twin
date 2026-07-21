@@ -11,6 +11,7 @@ types, failures, routing, bottleneck detection, and improvement recommendations.
 
 The current simulator models one machine, one queue, and one demand stream:
 
+- scenarios store the model name, time horizon, arrival rate, and process time
 - parts arrive at a fixed rate each minute
 - the machine completes one part every `process_time` minutes
 - unfinished parts wait in a queue

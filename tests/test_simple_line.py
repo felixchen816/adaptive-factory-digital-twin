@@ -1,6 +1,8 @@
 import pytest
 
+from factory_twin.scenario import Scenario
 from factory_twin.simple_line import simulate_line
+from factory_twin.simple_line import simulate_scenario
 
 
 def test_simulate_line_returns_basic_metrics():
@@ -35,3 +37,28 @@ def test_simulate_line_tracks_utilization():
 def test_simulate_line_tracks_queue_growth_rate():
     metrics = simulate_line(60, 1, 3)
     assert metrics["queue_growth_rate"] == 40
+
+
+def test_scenario_stores_simulation_inputs():
+    scenario = Scenario(
+        name="overloaded line",
+        minutes=60,
+        arrival_rate=1,
+        process_time=3,
+    )
+
+    assert scenario.name == "overloaded line"
+    assert scenario.minutes == 60
+    assert scenario.arrival_rate == 1
+    assert scenario.process_time == 3
+
+
+def test_simulate_scenario_matches_simulate_line():
+    scenario = Scenario(
+        name="overloaded line",
+        minutes=60,
+        arrival_rate=1,
+        process_time=3,
+    )
+
+    assert simulate_scenario(scenario) == simulate_line(60, 1, 3)
