@@ -9,9 +9,10 @@ types, failures, routing, bottleneck detection, and improvement recommendations.
 
 ## Current Model
 
-The current simulator models one machine, one queue, and one demand stream:
+The current simulator models one named machine, one queue, and one demand
+stream:
 
-- scenarios store the model name, time horizon, arrival rate, and process time
+- scenarios store the model name, time horizon, arrival rate, and machine
 - machine objects store a machine name and processing interval
 - parts arrive at a fixed rate each minute
 - the machine completes one part every `process_time` minutes
@@ -64,7 +65,7 @@ conditions:
   part every two minutes
 
 This makes it easier to compare how processing speed affects completed parts,
-throughput, queue size, utilization, and backlog growth.
+throughput, queue size, utilization, and backlog growth across named machines.
 
 ## Run Tests
 

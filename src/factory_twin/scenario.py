@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from factory_twin.machine import Machine
+
 
 @dataclass
 class Scenario:
@@ -8,4 +10,8 @@ class Scenario:
     name: str
     minutes: int
     arrival_rate: int
-    process_time: int
+    machine: Machine
+
+    @property
+    def process_time(self):
+        return self.machine.process_time

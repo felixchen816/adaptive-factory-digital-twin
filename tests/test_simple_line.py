@@ -42,25 +42,28 @@ def test_simulate_line_tracks_queue_growth_rate():
 
 
 def test_scenario_stores_simulation_inputs():
+    machine = Machine(name="press", process_time=3)
     scenario = Scenario(
         name="overloaded line",
         minutes=60,
         arrival_rate=1,
-        process_time=3,
+        machine=machine,
     )
 
     assert scenario.name == "overloaded line"
     assert scenario.minutes == 60
     assert scenario.arrival_rate == 1
+    assert scenario.machine == machine
     assert scenario.process_time == 3
 
 
 def test_simulate_scenario_matches_simulate_line():
+    machine = Machine(name="press", process_time=3)
     scenario = Scenario(
         name="overloaded line",
         minutes=60,
         arrival_rate=1,
-        process_time=3,
+        machine=machine,
     )
 
     assert simulate_scenario(scenario) == simulate_line(60, 1, 3)

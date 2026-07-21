@@ -71,7 +71,7 @@ if __name__ == "__main__":
             name="overloaded line",
             minutes=60,
             arrival_rate=1,
-            process_time=3,
+            machine=Machine(name="slow press", process_time=3),
         )
     )
     print("completed:", metrics["completed"])
