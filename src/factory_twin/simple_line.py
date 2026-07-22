@@ -43,7 +43,7 @@ def simulate_line(minutes, arrival_rate, process_time):
     utilization = busy_minutes / minutes if minutes else 0
     queue_growth_rate = queue - initial_queue
 
-    return {
+    metrics = {
         "completed": completed,
         "throughput_per_hour": throughput_per_hour,
         "average_queue_length": average_queue,
@@ -51,6 +51,8 @@ def simulate_line(minutes, arrival_rate, process_time):
         "utilization": utilization,
         "queue_growth_rate": queue_growth_rate,
     }
+    metrics["line_status"] = classify_line_status(metrics)
+    return metrics
 
 
 def simulate_scenario(scenario: Scenario):
@@ -63,6 +65,14 @@ def simulate_scenario(scenario: Scenario):
 
 def simulate_machine_line(minutes, arrival_rate, machine: Machine):
     return simulate_line(minutes, arrival_rate, machine.process_time)
+
+
+def classify_line_status(metrics):
+    if metrics["queue_growth_rate"] > 0:
+        return "overloaded"
+    if metrics["utilization"] < 0.75:
+        return "underused"
+    return "stable"
 
 
 if __name__ == "__main__":

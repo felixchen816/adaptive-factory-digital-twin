@@ -30,6 +30,7 @@ The simulator currently reports:
 - `utilization`: estimated fraction of simulated time the machine is busy
 - `queue_growth_rate`: final queue length minus initial queue length, showing
   whether backlog is building up
+- `line_status`: simple label for whether the line is `stable`, `overloaded`, or `underused`
 
 ## Run the Demo
 

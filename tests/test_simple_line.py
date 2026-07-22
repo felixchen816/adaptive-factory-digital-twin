@@ -85,3 +85,13 @@ def test_simulate_machine_line_matches_simulate_line():
     machine = Machine(name="press", process_time=3)
 
     assert simulate_machine_line(60, 1, machine) == simulate_line(60, 1, 3)
+
+
+def test_classifies_overloaded_line():
+    metrics = simulate_line(60, 1, 3)
+    assert metrics["line_status"] == "overloaded"
+
+
+def test_classifies_stable_line():
+    metrics = simulate_line(60, 1, 1)
+    assert metrics["line_status"] == "stable"

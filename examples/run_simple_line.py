@@ -38,6 +38,7 @@ def main():
         print(f"  max_queue_length: {metrics['max_queue_length']}")
         print(f"  utilization: {metrics['utilization']}")
         print(f"  queue_growth_rate: {metrics['queue_growth_rate']}")
+        print(f"  line_status: {metrics['line_status']}")
 
 
 if __name__ == "__main__":
