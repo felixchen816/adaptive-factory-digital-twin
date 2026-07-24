@@ -95,3 +95,8 @@ def test_classifies_overloaded_line():
 def test_classifies_stable_line():
     metrics = simulate_line(60, 1, 1)
     assert metrics["line_status"] == "stable"
+
+
+def test_classifies_underused_line():
+    metrics = simulate_line(60, 0, 1)
+    assert metrics["line_status"] == "underused"

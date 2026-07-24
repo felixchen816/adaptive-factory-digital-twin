@@ -90,3 +90,4 @@ if __name__ == "__main__":
     print("max_queue_length:", metrics["max_queue_length"])
     print("utilization:", metrics["utilization"])
     print("queue_growth_rate:", metrics["queue_growth_rate"])
+    print("line_status:", metrics["line_status"])

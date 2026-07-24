@@ -22,6 +22,12 @@ SCENARIOS = [
         arrival_rate=1,
         machine=Machine(name="upgraded press", process_time=2),
     ),
+    Scenario(
+        name="underused line",
+        minutes=60,
+        arrival_rate=0,
+        machine=Machine(name="idle cutter", process_time=1),
+    ),
 ]
 
 
