@@ -1,6 +1,6 @@
+from factory_twin.comparison import compare_scenarios
 from factory_twin.machine import Machine
 from factory_twin.scenario import Scenario
-from factory_twin.simple_line import simulate_scenario
 
 
 SCENARIOS = [
@@ -32,19 +32,18 @@ SCENARIOS = [
 
 
 def main():
-    for scenario in SCENARIOS:
-        metrics = simulate_scenario(scenario)
-
-        print(f"\nScenario: {scenario.name}")
-        print(f"  machine: {scenario.machine.name}")
-        print(f"  process_time: {scenario.machine.process_time}")
-        print(f"  completed: {metrics['completed']}")
-        print(f"  throughput_per_hour: {metrics['throughput_per_hour']}")
-        print(f"  average_queue_length: {metrics['average_queue_length']}")
-        print(f"  max_queue_length: {metrics['max_queue_length']}")
-        print(f"  utilization: {metrics['utilization']}")
-        print(f"  queue_growth_rate: {metrics['queue_growth_rate']}")
-        print(f"  line_status: {metrics['line_status']}")
+    rows = compare_scenarios(SCENARIOS)
+    for row in rows:
+        print(f"\nScenario: {row['scenario']}")
+        print(f"  machine: {row['machine']}")
+        print(f"  process_time: {row['process_time']}")
+        print(f"  completed: {row['completed']}")
+        print(f"  throughput_per_hour: {row['throughput_per_hour']}")
+        print(f"  average_queue_length: {row['average_queue_length']}")
+        print(f"  max_queue_length: {row['max_queue_length']}")
+        print(f"  utilization: {row['utilization']}")
+        print(f"  queue_growth_rate: {row['queue_growth_rate']}")
+        print(f"  line_status: {row['line_status']}")
 
 
 if __name__ == "__main__":

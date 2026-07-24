@@ -64,9 +64,12 @@ conditions:
   part every three minutes
 - `faster machine`: one part arrives each minute and the machine processes one
   part every two minutes
+- `underused line`: no parts arrive, so the machine stays idle
 
 This makes it easier to compare how processing speed affects completed parts,
-throughput, queue size, utilization, and backlog growth across named machines.
+throughput, queue size, utilization, backlog growth, and status labels across
+named machines. The example uses the reusable `compare_scenarios` helper in
+`factory_twin.comparison`.
 
 ## Run Tests
 
