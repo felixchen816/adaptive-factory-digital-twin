@@ -69,7 +69,8 @@ conditions:
 This makes it easier to compare how processing speed affects completed parts,
 throughput, queue size, utilization, backlog growth, and status labels across
 named machines. The example uses the reusable `compare_scenarios` helper in
-`factory_twin.comparison`.
+`factory_twin.comparison` and writes the results to `simple_line_results.csv`.
+The generated CSV file is ignored by git.
 
 ## Run Tests
 
