@@ -1,4 +1,5 @@
 from factory_twin.comparison import compare_scenarios
+from factory_twin.decision import choose_best_scenario
 from factory_twin.export import write_rows_to_csv
 from factory_twin.machine import Machine
 from factory_twin.scenario import Scenario
@@ -45,6 +46,9 @@ def main():
         print(f"  utilization: {row['utilization']}")
         print(f"  queue_growth_rate: {row['queue_growth_rate']}")
         print(f"  line_status: {row['line_status']}")
+
+    best = choose_best_scenario(rows)
+    print(f"\nBest scenario: {best['scenario']}")
 
     write_rows_to_csv(rows, "simple_line_results.csv")
     print("\nWrote results to simple_line_results.csv")

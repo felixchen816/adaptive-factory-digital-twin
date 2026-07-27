@@ -72,6 +72,10 @@ named machines. The example uses the reusable `compare_scenarios` helper in
 `factory_twin.comparison` and writes the results to `simple_line_results.csv`.
 The generated CSV file is ignored by git.
 
+The example also uses `choose_best_scenario` from `factory_twin.decision` to
+recommend the highest-throughput scenario while avoiding overloaded lines when
+possible.
+
 ## Run Tests
 
 ```bash
