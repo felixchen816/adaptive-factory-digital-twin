@@ -1,8 +1,14 @@
+from pathlib import Path
+
 from factory_twin.comparison import compare_scenarios
 from factory_twin.decision import choose_best_scenario
 from factory_twin.export import write_rows_to_csv
 from factory_twin.machine import Machine
+from factory_twin.report import build_markdown_report
 from factory_twin.scenario import Scenario
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 SCENARIOS = [
@@ -50,8 +56,15 @@ def main():
     best = choose_best_scenario(rows)
     print(f"\nBest scenario: {best['scenario']}")
 
-    write_rows_to_csv(rows, "simple_line_results.csv")
+    csv_path = REPO_ROOT / "simple_line_results.csv"
+    write_rows_to_csv(rows, csv_path)
     print("\nWrote results to simple_line_results.csv")
+
+    report = build_markdown_report(rows, best)
+    report_path = REPO_ROOT / "simple_line_report.md"
+    with open(report_path, "w", encoding="utf-8") as report_file:
+        report_file.write(report)
+    print("Wrote report to simple_line_report.md")
 
 
 if __name__ == "__main__":

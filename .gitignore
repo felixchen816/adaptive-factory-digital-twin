@@ -4,3 +4,4 @@ __pycache__/
 .pytest_cache/
 *.pyc
 simple_line_results.csv
+simple_line_report.md

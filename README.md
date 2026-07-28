@@ -76,6 +76,10 @@ The example also uses `choose_best_scenario` from `factory_twin.decision` to
 recommend the highest-throughput scenario while avoiding overloaded lines when
 possible.
 
+It also writes a Markdown decision report to `simple_line_report.md` using
+`build_markdown_report` from `factory_twin.report`. The generated report is
+ignored by git.
+
 ## Run Tests
 
 ```bash
