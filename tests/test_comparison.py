@@ -44,3 +44,6 @@ def test_compare_scenarios_includes_identity_and_metrics():
     assert row["utilization"] == 1.0
     assert row["queue_growth_rate"] == 40
     assert row["line_status"] == "overloaded"
+    assert row["explanation"] == (
+        "Backlog is growing because arrivals exceed effective processing capacity."
+    )

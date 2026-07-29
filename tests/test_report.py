@@ -18,3 +18,5 @@ def test_simple_line_report_contains_expected_strings():
     assert "# Simple Line Scenario Report" in text
     assert "Best scenario: balanced line" in text
     assert "overloaded line" in text
+    assert "Explanation" in text
+    assert "Backlog is growing" in text

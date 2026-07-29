@@ -52,6 +52,7 @@ def main():
         print(f"  utilization: {row['utilization']}")
         print(f"  queue_growth_rate: {row['queue_growth_rate']}")
         print(f"  line_status: {row['line_status']}")
+        print(f"  explanation: {row['explanation']}")
 
     best = choose_best_scenario(rows)
     print(f"\nBest scenario: {best['scenario']}")
