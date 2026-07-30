@@ -1,4 +1,5 @@
 from factory_twin.bottleneck import explain_line_status
+from factory_twin.recommendation import recommend_action
 from factory_twin.simple_line import simulate_scenario
 
 
@@ -15,6 +16,7 @@ def compare_scenarios(scenarios):
             **metrics,
         }
         row["explanation"] = explain_line_status(row)
+        row["recommendation"] = recommend_action(row)
         rows.append(row)
 
     return rows

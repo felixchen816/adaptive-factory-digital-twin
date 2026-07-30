@@ -47,3 +47,6 @@ def test_compare_scenarios_includes_identity_and_metrics():
     assert row["explanation"] == (
         "Backlog is growing because arrivals exceed effective processing capacity."
     )
+    assert row["recommendation"] == (
+        "Increase capacity, reduce process time, or lower arrivals to stop backlog growth."
+    )

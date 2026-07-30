@@ -20,3 +20,5 @@ def test_simple_line_report_contains_expected_strings():
     assert "overloaded line" in text
     assert "Explanation" in text
     assert "Backlog is growing" in text
+    assert "Recommendation" in text
+    assert "Increase capacity" in text
