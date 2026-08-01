@@ -3,6 +3,7 @@ from pathlib import Path
 from factory_twin.comparison import compare_scenarios
 from factory_twin.decision import choose_best_scenario
 from factory_twin.export import write_rows_to_csv
+from factory_twin.line import ProductionLine
 from factory_twin.machine import Machine
 from factory_twin.report import build_markdown_report
 from factory_twin.scenario import Scenario
@@ -10,6 +11,14 @@ from factory_twin.scenario import Scenario
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
+THREE_STAGE_LINE = ProductionLine(
+    "three-stage line",
+    [
+        Machine(name="cutter", process_time=1),
+        Machine(name="press", process_time=3),
+        Machine(name="inspector", process_time=2),
+    ],
+)
 
 SCENARIOS = [
     Scenario(
@@ -31,6 +40,12 @@ SCENARIOS = [
         machine=Machine(name="upgraded press", process_time=2),
     ),
     Scenario(
+        name="three-stage line",
+        minutes=60,
+        arrival_rate=1,
+        machine=THREE_STAGE_LINE.bottleneck_machine,
+    ),
+    Scenario(
         name="underused line",
         minutes=60,
         arrival_rate=0,
@@ -41,6 +56,11 @@ SCENARIOS = [
 
 def main():
     rows = compare_scenarios(SCENARIOS)
+    print(
+        f"Three-stage bottleneck: {THREE_STAGE_LINE.bottleneck_machine.name} "
+        f"({THREE_STAGE_LINE.capacity_per_hour} parts/hour)"
+    )
+
     for row in rows:
         print(f"\nScenario: {row['scenario']}")
         print(f"  machine: {row['machine']}")
