@@ -5,6 +5,7 @@ from factory_twin.decision import choose_best_scenario
 from factory_twin.export import write_rows_to_csv
 from factory_twin.line import ProductionLine
 from factory_twin.machine import Machine
+from factory_twin.multi_stage import simulate_production_line
 from factory_twin.report import build_markdown_report
 from factory_twin.scenario import Scenario
 
@@ -40,12 +41,6 @@ SCENARIOS = [
         machine=Machine(name="upgraded press", process_time=2),
     ),
     Scenario(
-        name="three-stage line",
-        minutes=60,
-        arrival_rate=1,
-        machine=THREE_STAGE_LINE.bottleneck_machine,
-    ),
-    Scenario(
         name="underused line",
         minutes=60,
         arrival_rate=0,
@@ -56,10 +51,14 @@ SCENARIOS = [
 
 def main():
     rows = compare_scenarios(SCENARIOS)
+    multi_stage_metrics = simulate_production_line(THREE_STAGE_LINE, 60, 1)
     print(
         f"Three-stage bottleneck: {THREE_STAGE_LINE.bottleneck_machine.name} "
         f"({THREE_STAGE_LINE.capacity_per_hour} parts/hour)"
     )
+    print(f"Three-stage completed: {multi_stage_metrics['completed']}")
+    print(f"Three-stage final queues: {multi_stage_metrics['final_queue_lengths']}")
+    print(f"Three-stage max queues: {multi_stage_metrics['max_queue_lengths']}")
 
     for row in rows:
         print(f"\nScenario: {row['scenario']}")
