@@ -39,6 +39,9 @@ def test_compare_scenarios_includes_identity_and_metrics():
     assert row["process_time"] == 3
     assert row["completed"] == 20
     assert row["throughput_per_hour"] == 20.0
+    assert row["demand_per_hour"] == 60
+    assert row["capacity_per_hour"] == 20.0
+    assert row["capacity_gap_per_hour"] == -40.0
     assert row["average_queue_length"] == 20.0
     assert row["max_queue_length"] == 40
     assert row["utilization"] == 1.0

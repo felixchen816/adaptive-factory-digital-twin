@@ -12,7 +12,8 @@ def simulate_line(minutes, arrival_rate, process_time):
         process_time: Minutes between processing each part.
 
     Returns:
-        Dictionary with completed parts, queue metrics, throughput, and utilization.
+        Dictionary with completed parts, queue metrics, throughput, utilization,
+        and capacity planning metrics.
     """
     if minutes < 0:
         raise ValueError("minutes must be non-negative")
@@ -39,6 +40,9 @@ def simulate_line(minutes, arrival_rate, process_time):
 
     average_queue = sum(queue_lengths) / len(queue_lengths) if queue_lengths else 0
     throughput_per_hour = completed * 60 / minutes if minutes else 0
+    demand_per_hour = arrival_rate * 60
+    capacity_per_hour = 60 / process_time
+    capacity_gap_per_hour = capacity_per_hour - demand_per_hour
     busy_minutes = min(completed * process_time, minutes)
     utilization = busy_minutes / minutes if minutes else 0
     queue_growth_rate = queue - initial_queue
@@ -46,6 +50,9 @@ def simulate_line(minutes, arrival_rate, process_time):
     metrics = {
         "completed": completed,
         "throughput_per_hour": throughput_per_hour,
+        "demand_per_hour": demand_per_hour,
+        "capacity_per_hour": capacity_per_hour,
+        "capacity_gap_per_hour": capacity_gap_per_hour,
         "average_queue_length": average_queue,
         "max_queue_length": max_queue,
         "utilization": utilization,
@@ -86,6 +93,9 @@ if __name__ == "__main__":
     )
     print("completed:", metrics["completed"])
     print("throughput_per_hour:", metrics["throughput_per_hour"])
+    print("demand_per_hour:", metrics["demand_per_hour"])
+    print("capacity_per_hour:", metrics["capacity_per_hour"])
+    print("capacity_gap_per_hour:", metrics["capacity_gap_per_hour"])
     print("average_queue_length:", metrics["average_queue_length"])
     print("max_queue_length:", metrics["max_queue_length"])
     print("utilization:", metrics["utilization"])

@@ -41,6 +41,14 @@ def test_simulate_line_tracks_queue_growth_rate():
     assert metrics["queue_growth_rate"] == 40
 
 
+def test_simulate_line_tracks_capacity_planning_metrics():
+    metrics = simulate_line(60, 1, 3)
+
+    assert metrics["demand_per_hour"] == 60
+    assert metrics["capacity_per_hour"] == 20.0
+    assert metrics["capacity_gap_per_hour"] == -40.0
+
+
 def test_scenario_stores_simulation_inputs():
     machine = Machine(name="press", process_time=3)
     scenario = Scenario(

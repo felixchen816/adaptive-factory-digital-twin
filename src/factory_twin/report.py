@@ -8,15 +8,17 @@ def build_markdown_report(rows, best):
         "",
         "## Scenario Results",
         "",
-        "| Scenario | Machine | Status | Throughput/hr | Avg Queue | Max Queue | Explanation | Recommendation |",
-        "| --- | --- | --- | ---: | ---: | ---: | --- | --- |",
+        "| Scenario | Machine | Status | Throughput/hr | Demand/hr | Capacity/hr | Capacity Gap/hr | Avg Queue | Max Queue | Explanation | Recommendation |",
+        "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |",
     ]
 
     for row in rows:
         lines.append(
             f"| {row['scenario']} | {row['machine']} | {row['line_status']} | "
-            f"{row['throughput_per_hour']} | {row['average_queue_length']} | "
-            f"{row['max_queue_length']} | {row['explanation']} | "
+            f"{row['throughput_per_hour']} | {row['demand_per_hour']} | "
+            f"{row['capacity_per_hour']} | {row['capacity_gap_per_hour']} | "
+            f"{row['average_queue_length']} | {row['max_queue_length']} | "
+            f"{row['explanation']} | "
             f"{row['recommendation']} |"
         )
 
