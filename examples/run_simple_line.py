@@ -4,6 +4,11 @@ from factory_twin.comparison import compare_scenarios
 from factory_twin.decision import choose_best_scenario
 from factory_twin.export import write_rows_to_csv
 from factory_twin.line import ProductionLine
+from factory_twin.line_analysis import (
+    explain_queue_bottleneck,
+    find_queue_bottleneck,
+    recommend_line_action,
+)
 from factory_twin.machine import Machine
 from factory_twin.multi_stage import simulate_production_line
 from factory_twin.report import build_markdown_report
@@ -59,6 +64,16 @@ def main():
     print(f"Three-stage completed: {multi_stage_metrics['completed']}")
     print(f"Three-stage final queues: {multi_stage_metrics['final_queue_lengths']}")
     print(f"Three-stage max queues: {multi_stage_metrics['max_queue_lengths']}")
+
+    # Queue bottleneck analysis for multi-stage line
+    final_queues = multi_stage_metrics["final_queue_lengths"]
+    queue_bottleneck = find_queue_bottleneck(final_queues)
+    queue_explanation = explain_queue_bottleneck(final_queues)
+    line_recommendation = recommend_line_action(final_queues)
+
+    print(f"Queue bottleneck: {queue_bottleneck}")
+    print(f"Explanation: {queue_explanation}")
+    print(f"Line recommendation: {line_recommendation}")
 
     for row in rows:
         print(f"\nScenario: {row['scenario']}")
