@@ -2,7 +2,7 @@ from pathlib import Path
 
 from factory_twin.comparison import compare_scenarios
 from factory_twin.decision import choose_best_scenario
-from factory_twin.export import write_rows_to_csv
+from factory_twin.export import write_metrics_to_json, write_rows_to_csv
 from factory_twin.line import ProductionLine
 from factory_twin.line_analysis import (
     explain_queue_bottleneck,
@@ -57,13 +57,6 @@ SCENARIOS = [
 def main():
     rows = compare_scenarios(SCENARIOS)
     multi_stage_metrics = simulate_production_line(THREE_STAGE_LINE, 60, 1)
-    print(
-        f"Three-stage bottleneck: {THREE_STAGE_LINE.bottleneck_machine.name} "
-        f"({THREE_STAGE_LINE.capacity_per_hour} parts/hour)"
-    )
-    print(f"Three-stage completed: {multi_stage_metrics['completed']}")
-    print(f"Three-stage final queues: {multi_stage_metrics['final_queue_lengths']}")
-    print(f"Three-stage max queues: {multi_stage_metrics['max_queue_lengths']}")
 
     # Queue bottleneck analysis for multi-stage line
     final_queues = multi_stage_metrics["final_queue_lengths"]
@@ -71,9 +64,36 @@ def main():
     queue_explanation = explain_queue_bottleneck(final_queues)
     line_recommendation = recommend_line_action(final_queues)
 
+    print(
+        f"Three-stage bottleneck: {THREE_STAGE_LINE.bottleneck_machine.name} "
+        f"({THREE_STAGE_LINE.capacity_per_hour} parts/hour)"
+    )
+    print(f"Three-stage completed: {multi_stage_metrics['completed']}")
+    print(f"Three-stage final queues: {multi_stage_metrics['final_queue_lengths']}")
+    print(f"Three-stage max queues: {multi_stage_metrics['max_queue_lengths']}")
     print(f"Queue bottleneck: {queue_bottleneck}")
     print(f"Explanation: {queue_explanation}")
     print(f"Line recommendation: {line_recommendation}")
+
+    # Build multi-stage export dictionary matching expected schema
+    multi_stage_results = {
+        "line": THREE_STAGE_LINE.name,
+        "completed": multi_stage_metrics["completed"],
+        "arrivals": multi_stage_metrics.get("arrivals", 60),
+        "throughput_per_hour": float(multi_stage_metrics["completed"]),
+        "bottleneck_machine": THREE_STAGE_LINE.bottleneck_machine.name,
+        "line_capacity_per_hour": float(THREE_STAGE_LINE.capacity_per_hour),
+        "final_queue_lengths": final_queues,
+        "max_queue_lengths": multi_stage_metrics["max_queue_lengths"],
+        "total_wip": sum(final_queues.values()),
+        "queue_bottleneck": queue_bottleneck,
+        "recommendation": line_recommendation,
+    }
+
+    # Save multi-stage results JSON
+    json_path = REPO_ROOT / "multi_stage_results.json"
+    write_metrics_to_json(multi_stage_results, json_path)
+    print(f"Wrote results to {json_path.name}")
 
     for row in rows:
         print(f"\nScenario: {row['scenario']}")
