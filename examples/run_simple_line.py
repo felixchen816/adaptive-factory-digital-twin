@@ -1,4 +1,10 @@
 from pathlib import Path
+import sys
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SRC_DIR = REPO_ROOT / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
 
 from factory_twin.comparison import compare_scenarios
 from factory_twin.decision import choose_best_scenario
@@ -11,11 +17,13 @@ from factory_twin.line_analysis import (
 )
 from factory_twin.machine import Machine
 from factory_twin.multi_stage import simulate_production_line
+from factory_twin.multi_stage_comparison import (
+    MultiStageScenario,
+    compare_multi_stage_scenarios,
+)
 from factory_twin.report import build_markdown_report
 from factory_twin.scenario import Scenario
 
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
 
 THREE_STAGE_LINE = ProductionLine(
     "three-stage line",
@@ -25,6 +33,31 @@ THREE_STAGE_LINE = ProductionLine(
         Machine(name="inspector", process_time=2),
     ],
 )
+
+FASTER_PRESS_LINE = ProductionLine(
+    "faster press line",
+    [
+        Machine(name="cutter", process_time=1),
+        Machine(name="press", process_time=2),
+        Machine(name="inspector", process_time=2),
+    ],
+)
+
+SLOW_INSPECTOR_LINE = ProductionLine(
+    "slow inspector line",
+    [
+        Machine(name="cutter", process_time=1),
+        Machine(name="press", process_time=1),
+        Machine(name="inspector", process_time=4),
+    ],
+)
+
+MULTI_STAGE_SCENARIOS = [
+    MultiStageScenario("baseline", THREE_STAGE_LINE, minutes=60, arrival_rate=1.0),
+    MultiStageScenario("faster press", FASTER_PRESS_LINE, minutes=60, arrival_rate=1.0),
+    MultiStageScenario("slow inspector", SLOW_INSPECTOR_LINE, minutes=60, arrival_rate=1.0),
+    MultiStageScenario("lower demand", THREE_STAGE_LINE, minutes=60, arrival_rate=0.5),
+]
 
 SCENARIOS = [
     Scenario(
@@ -75,6 +108,15 @@ def main():
     print(f"Explanation: {queue_explanation}")
     print(f"Line recommendation: {line_recommendation}")
 
+    # Print multi-stage comparison
+    ms_rows = compare_multi_stage_scenarios(MULTI_STAGE_SCENARIOS)
+    print("\nMulti-stage scenario comparison")
+    for row in ms_rows:
+        print(
+            f"{row['scenario']}: completed={row['completed']}, "
+            f"bottleneck={row['queue_bottleneck']}, total_wip={row['total_wip']}"
+        )
+
     # Build multi-stage export dictionary matching expected schema
     multi_stage_results = {
         "line": THREE_STAGE_LINE.name,
@@ -93,7 +135,7 @@ def main():
     # Save multi-stage results JSON
     json_path = REPO_ROOT / "multi_stage_results.json"
     write_metrics_to_json(multi_stage_results, json_path)
-    print(f"Wrote results to {json_path.name}")
+    print(f"\nWrote results to {json_path.name}")
 
     for row in rows:
         print(f"\nScenario: {row['scenario']}")

@@ -1,0 +1,69 @@
+"""Multi-stage scenario comparison tools for production line configurations."""
+
+from dataclasses import dataclass
+from typing import Sequence
+
+from factory_twin.line import ProductionLine
+from factory_twin.line_analysis import (
+    explain_queue_bottleneck,
+    find_queue_bottleneck,
+    recommend_line_action,
+)
+from factory_twin.multi_stage import simulate_production_line
+
+
+@dataclass
+class MultiStageScenario:
+    """Configuration for a multi-stage line simulation scenario."""
+
+    name: str
+    line: ProductionLine
+    minutes: int = 60
+    arrival_rate: float = 1.0
+
+
+def compare_multi_stage_scenarios(
+    scenarios: Sequence[MultiStageScenario],
+):
+    """Simulate multiple multi-stage production line scenarios and return comparison metrics.
+
+    Args:
+        scenarios: List of MultiStageScenario instances to run.
+
+    Returns:
+        List of result dictionaries containing performance metrics for each scenario.
+    """
+    rows = []
+    for scenario in scenarios:
+        metrics = simulate_production_line(
+            scenario.line,
+            scenario.minutes,
+            scenario.arrival_rate,
+        )
+
+        final_queues = metrics.get("final_queue_lengths", {})
+        queue_bottleneck = find_queue_bottleneck(final_queues)
+        explanation = explain_queue_bottleneck(final_queues)
+        recommendation = recommend_line_action(final_queues)
+
+        completed = metrics["completed"]
+        arrivals = metrics["arrivals"]
+        total_wip = sum(final_queues.values())
+
+        row = {
+            "scenario": scenario.name,
+            "completed": completed,
+            "arrivals": arrivals,
+            "throughput_per_hour": metrics["throughput_per_hour"],
+            "bottleneck_machine": metrics["bottleneck_machine"],
+            "line_capacity_per_hour": metrics["line_capacity_per_hour"],
+            "final_queue_lengths": final_queues,
+            "max_queue_lengths": metrics["max_queue_lengths"],
+            "queue_bottleneck": queue_bottleneck,
+            "total_wip": total_wip,
+            "explanation": explanation,
+            "recommendation": recommendation,
+        }
+        rows.append(row)
+
+    return rows
