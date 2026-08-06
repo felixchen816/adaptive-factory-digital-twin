@@ -21,6 +21,7 @@ from factory_twin.multi_stage_comparison import (
     MultiStageScenario,
     compare_multi_stage_scenarios,
 )
+from factory_twin.multi_stage_decision import choose_best_multi_stage_scenario
 from factory_twin.report import build_markdown_report
 from factory_twin.scenario import Scenario
 
@@ -116,6 +117,8 @@ def main():
             f"{row['scenario']}: completed={row['completed']}, "
             f"bottleneck={row['queue_bottleneck']}, total_wip={row['total_wip']}"
         )
+    best_multi_stage = choose_best_multi_stage_scenario(ms_rows)
+    print(f"Best multi-stage scenario: {best_multi_stage['scenario']}")
 
     # Build multi-stage export dictionary matching expected schema
     multi_stage_results = {
