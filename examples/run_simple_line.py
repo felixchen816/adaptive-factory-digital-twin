@@ -22,6 +22,7 @@ from factory_twin.multi_stage_comparison import (
     compare_multi_stage_scenarios,
 )
 from factory_twin.multi_stage_decision import choose_best_multi_stage_scenario
+from factory_twin.multi_stage_report import build_multi_stage_report
 from factory_twin.report import build_markdown_report
 from factory_twin.scenario import Scenario
 
@@ -119,6 +120,12 @@ def main():
         )
     best_multi_stage = choose_best_multi_stage_scenario(ms_rows)
     print(f"Best multi-stage scenario: {best_multi_stage['scenario']}")
+
+    multi_stage_report = build_multi_stage_report(ms_rows, best_multi_stage)
+    multi_stage_report_path = REPO_ROOT / "multi_stage_report.md"
+    with open(multi_stage_report_path, "w", encoding="utf-8") as report_file:
+        report_file.write(multi_stage_report)
+    print(f"Wrote report to {multi_stage_report_path.name}")
 
     # Build multi-stage export dictionary matching expected schema
     multi_stage_results = {
