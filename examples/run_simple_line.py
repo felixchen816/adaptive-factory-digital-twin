@@ -116,7 +116,10 @@ def main():
     for row in ms_rows:
         print(
             f"{row['scenario']}: completed={row['completed']}, "
-            f"bottleneck={row['queue_bottleneck']}, total_wip={row['total_wip']}"
+            f"completion_rate={row['completion_rate']:.2f}, "
+            f"largest_queue={row['largest_final_queue']}, "
+            f"bottleneck={row['queue_bottleneck']}, "
+            f"total_wip={row['total_wip']}"
         )
     best_multi_stage = choose_best_multi_stage_scenario(ms_rows)
     print(f"Best multi-stage scenario: {best_multi_stage['scenario']}")

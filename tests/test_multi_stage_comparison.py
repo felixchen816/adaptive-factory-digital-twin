@@ -95,8 +95,47 @@ def test_result_keys(sample_scenarios):
         "max_queue_lengths",
         "queue_bottleneck",
         "total_wip",
+        "largest_final_queue",
+        "largest_max_queue",
+        "wip_per_completed_part",
+        "completion_rate",
         "explanation",
         "recommendation",
     }
     for row in results:
         assert expected_keys.issubset(row.keys())
+
+
+def test_summary_metrics_are_added_to_rows(sample_scenarios):
+    results = compare_multi_stage_scenarios(sample_scenarios)
+    baseline = {row["scenario"]: row for row in results}["baseline"]
+
+    assert baseline["largest_final_queue"] == 41
+    assert baseline["largest_max_queue"] == 41
+    assert baseline["completion_rate"] == pytest.approx(19 / 60)
+    assert baseline["wip_per_completed_part"] == pytest.approx(41 / 19)
+
+
+def test_summary_metrics_handle_zero_completed_parts():
+    line = ProductionLine(
+        "no demand line",
+        [
+            Machine(name="cutter", process_time=1),
+            Machine(name="press", process_time=3),
+        ],
+    )
+    scenarios = [
+        MultiStageScenario(
+            name="no demand",
+            line=line,
+            minutes=60,
+            arrival_rate=0,
+        )
+    ]
+
+    row = compare_multi_stage_scenarios(scenarios)[0]
+
+    assert row["completed"] == 0
+    assert row["arrivals"] == 0
+    assert row["completion_rate"] == 0
+    assert row["wip_per_completed_part"] == 0
