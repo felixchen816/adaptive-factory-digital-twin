@@ -100,9 +100,10 @@ Each comparison row includes:
 
 The best multi-stage scenario is selected by:
 
-1. highest completed parts
-2. lowest total WIP as a tie-breaker
-3. lowest largest queue as the final tie-breaker
+1. highest completion rate
+2. highest completed parts as a tie-breaker
+3. lowest total WIP as the next tie-breaker
+4. lowest largest max queue as the final tie-breaker
 
 ## Reports and Exports
 
