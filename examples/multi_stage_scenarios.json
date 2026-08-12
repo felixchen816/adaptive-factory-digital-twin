@@ -1,0 +1,42 @@
+[
+  {
+    "name": "baseline",
+    "minutes": 60,
+    "arrival_rate": 1.0,
+    "machines": [
+      {"name": "cutter", "process_time": 1},
+      {"name": "press", "process_time": 3},
+      {"name": "inspector", "process_time": 2}
+    ]
+  },
+  {
+    "name": "faster press",
+    "minutes": 60,
+    "arrival_rate": 1.0,
+    "machines": [
+      {"name": "cutter", "process_time": 1},
+      {"name": "press", "process_time": 2},
+      {"name": "inspector", "process_time": 2}
+    ]
+  },
+  {
+    "name": "slow inspector",
+    "minutes": 60,
+    "arrival_rate": 1.0,
+    "machines": [
+      {"name": "cutter", "process_time": 1},
+      {"name": "press", "process_time": 1},
+      {"name": "inspector", "process_time": 4}
+    ]
+  },
+  {
+    "name": "lower demand",
+    "minutes": 60,
+    "arrival_rate": 0.5,
+    "machines": [
+      {"name": "cutter", "process_time": 1},
+      {"name": "press", "process_time": 3},
+      {"name": "inspector", "process_time": 2}
+    ]
+  }
+]

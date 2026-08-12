@@ -7,6 +7,7 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from factory_twin.comparison import compare_scenarios
+from factory_twin.config import load_multi_stage_scenarios
 from factory_twin.decision import choose_best_scenario
 from factory_twin.export import write_metrics_to_json, write_rows_to_csv
 from factory_twin.line import ProductionLine
@@ -17,10 +18,7 @@ from factory_twin.line_analysis import (
 )
 from factory_twin.machine import Machine
 from factory_twin.multi_stage import simulate_production_line
-from factory_twin.multi_stage_comparison import (
-    MultiStageScenario,
-    compare_multi_stage_scenarios,
-)
+from factory_twin.multi_stage_comparison import compare_multi_stage_scenarios
 from factory_twin.multi_stage_decision import choose_best_multi_stage_scenario
 from factory_twin.multi_stage_report import build_multi_stage_report
 from factory_twin.report import build_markdown_report
@@ -36,30 +34,7 @@ THREE_STAGE_LINE = ProductionLine(
     ],
 )
 
-FASTER_PRESS_LINE = ProductionLine(
-    "faster press line",
-    [
-        Machine(name="cutter", process_time=1),
-        Machine(name="press", process_time=2),
-        Machine(name="inspector", process_time=2),
-    ],
-)
-
-SLOW_INSPECTOR_LINE = ProductionLine(
-    "slow inspector line",
-    [
-        Machine(name="cutter", process_time=1),
-        Machine(name="press", process_time=1),
-        Machine(name="inspector", process_time=4),
-    ],
-)
-
-MULTI_STAGE_SCENARIOS = [
-    MultiStageScenario("baseline", THREE_STAGE_LINE, minutes=60, arrival_rate=1.0),
-    MultiStageScenario("faster press", FASTER_PRESS_LINE, minutes=60, arrival_rate=1.0),
-    MultiStageScenario("slow inspector", SLOW_INSPECTOR_LINE, minutes=60, arrival_rate=1.0),
-    MultiStageScenario("lower demand", THREE_STAGE_LINE, minutes=60, arrival_rate=0.5),
-]
+MULTI_STAGE_CONFIG_PATH = REPO_ROOT / "examples" / "multi_stage_scenarios.json"
 
 SCENARIOS = [
     Scenario(
@@ -111,7 +86,8 @@ def main():
     print(f"Line recommendation: {line_recommendation}")
 
     # Print multi-stage comparison
-    ms_rows = compare_multi_stage_scenarios(MULTI_STAGE_SCENARIOS)
+    multi_stage_scenarios = load_multi_stage_scenarios(MULTI_STAGE_CONFIG_PATH)
+    ms_rows = compare_multi_stage_scenarios(multi_stage_scenarios)
     print("\nMulti-stage scenario comparison")
     for row in ms_rows:
         print(
