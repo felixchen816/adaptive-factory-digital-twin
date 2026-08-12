@@ -129,6 +129,15 @@ comparison results, and the selected best multi-stage scenario.
 
 It also writes the CSV, JSON, and Markdown report files listed above.
 
+To use a different multi-stage scenario file or output location:
+
+```bash
+.venv/bin/python examples/run_simple_line.py \
+  --multi-stage-config examples/multi_stage_scenarios.json \
+  --multi-stage-json multi_stage_results.json \
+  --multi-stage-report multi_stage_report.md
+```
+
 ## Run Tests
 
 ```bash
@@ -154,6 +163,7 @@ src/factory_twin/
   multi_stage_comparison.py   multi-stage scenario comparison
   multi_stage_decision.py     multi-stage best-scenario selector
   multi_stage_report.py       multi-stage Markdown report
+  config.py                   JSON scenario loading
   export.py                   CSV and JSON export helpers
 ```
 
@@ -167,7 +177,7 @@ Next steps:
 - model parallel machines at one stage
 - add machine downtime or failure events
 - add charts for throughput, WIP, and queue growth
-- add configurable scenario input files
+- add validation for richer scenario input files
 
 ## Why This Project Matters
 

@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 import sys
 
@@ -64,7 +65,46 @@ SCENARIOS = [
 ]
 
 
-def main():
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Run factory twin one-machine and multi-stage demos."
+    )
+    parser.add_argument(
+        "--multi-stage-config",
+        default=MULTI_STAGE_CONFIG_PATH,
+        type=Path,
+        help="Path to a multi-stage scenario JSON file.",
+    )
+    parser.add_argument(
+        "--multi-stage-json",
+        default=REPO_ROOT / "multi_stage_results.json",
+        type=Path,
+        help="Output path for multi-stage JSON metrics.",
+    )
+    parser.add_argument(
+        "--multi-stage-report",
+        default=REPO_ROOT / "multi_stage_report.md",
+        type=Path,
+        help="Output path for the multi-stage Markdown report.",
+    )
+    parser.add_argument(
+        "--simple-csv",
+        default=REPO_ROOT / "simple_line_results.csv",
+        type=Path,
+        help="Output path for one-machine scenario CSV results.",
+    )
+    parser.add_argument(
+        "--simple-report",
+        default=REPO_ROOT / "simple_line_report.md",
+        type=Path,
+        help="Output path for the one-machine Markdown report.",
+    )
+    args, _unknown_args = parser.parse_known_args(argv)
+    return args
+
+
+def main(argv=None):
+    args = parse_args(argv)
     rows = compare_scenarios(SCENARIOS)
     multi_stage_metrics = simulate_production_line(THREE_STAGE_LINE, 60, 1)
 
@@ -86,7 +126,7 @@ def main():
     print(f"Line recommendation: {line_recommendation}")
 
     # Print multi-stage comparison
-    multi_stage_scenarios = load_multi_stage_scenarios(MULTI_STAGE_CONFIG_PATH)
+    multi_stage_scenarios = load_multi_stage_scenarios(args.multi_stage_config)
     ms_rows = compare_multi_stage_scenarios(multi_stage_scenarios)
     print("\nMulti-stage scenario comparison")
     for row in ms_rows:
@@ -101,10 +141,9 @@ def main():
     print(f"Best multi-stage scenario: {best_multi_stage['scenario']}")
 
     multi_stage_report = build_multi_stage_report(ms_rows, best_multi_stage)
-    multi_stage_report_path = REPO_ROOT / "multi_stage_report.md"
-    with open(multi_stage_report_path, "w", encoding="utf-8") as report_file:
+    with open(args.multi_stage_report, "w", encoding="utf-8") as report_file:
         report_file.write(multi_stage_report)
-    print(f"Wrote report to {multi_stage_report_path.name}")
+    print(f"Wrote report to {args.multi_stage_report.name}")
 
     # Build multi-stage export dictionary matching expected schema
     multi_stage_results = {
@@ -122,9 +161,8 @@ def main():
     }
 
     # Save multi-stage results JSON
-    json_path = REPO_ROOT / "multi_stage_results.json"
-    write_metrics_to_json(multi_stage_results, json_path)
-    print(f"\nWrote results to {json_path.name}")
+    write_metrics_to_json(multi_stage_results, args.multi_stage_json)
+    print(f"\nWrote results to {args.multi_stage_json.name}")
 
     for row in rows:
         print(f"\nScenario: {row['scenario']}")
@@ -146,15 +184,13 @@ def main():
     best = choose_best_scenario(rows)
     print(f"\nBest scenario: {best['scenario']}")
 
-    csv_path = REPO_ROOT / "simple_line_results.csv"
-    write_rows_to_csv(rows, csv_path)
-    print("\nWrote results to simple_line_results.csv")
+    write_rows_to_csv(rows, args.simple_csv)
+    print(f"\nWrote results to {args.simple_csv.name}")
 
     report = build_markdown_report(rows, best)
-    report_path = REPO_ROOT / "simple_line_report.md"
-    with open(report_path, "w", encoding="utf-8") as report_file:
+    with open(args.simple_report, "w", encoding="utf-8") as report_file:
         report_file.write(report)
-    print("Wrote report to simple_line_report.md")
+    print(f"Wrote report to {args.simple_report.name}")
 
 
 if __name__ == "__main__":
