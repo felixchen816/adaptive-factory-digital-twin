@@ -138,6 +138,39 @@ To use a different multi-stage scenario file or output location:
   --multi-stage-report multi_stage_report.md
 ```
 
+## Scenario Config Format
+
+Multi-stage scenario config files are JSON lists. Each scenario requires a
+non-empty `name` and at least one machine. `minutes` defaults to `60`, and
+`arrival_rate` defaults to `1.0`.
+
+```json
+[
+  {
+    "name": "baseline",
+    "minutes": 60,
+    "arrival_rate": 1.0,
+    "machines": [
+      {"name": "cutter", "process_time": 1},
+      {"name": "press", "process_time": 3},
+      {"name": "inspector", "process_time": 2}
+    ]
+  }
+]
+```
+
+Config validation rejects:
+
+- non-list config files
+- non-object scenarios
+- duplicate scenario names
+- missing scenario names
+- negative `minutes`
+- negative `arrival_rate`
+- empty machine lists
+- missing machine names
+- missing or non-positive machine `process_time`
+
 ## Run Tests
 
 ```bash
@@ -177,7 +210,7 @@ Next steps:
 - model parallel machines at one stage
 - add machine downtime or failure events
 - add charts for throughput, WIP, and queue growth
-- add validation for richer scenario input files
+- model scenario-specific improvement costs
 
 ## Why This Project Matters
 

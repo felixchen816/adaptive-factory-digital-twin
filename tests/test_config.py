@@ -86,3 +86,125 @@ def test_load_multi_stage_scenarios_rejects_non_list_config(tmp_path):
 
     with pytest.raises(ValueError, match="scenario config must be a list"):
         load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_non_object_scenario(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(json.dumps(["baseline"]), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="each scenario must be an object"):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_duplicate_scenario_names(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "baseline",
+                    "machines": [{"name": "cutter", "process_time": 1}],
+                },
+                {
+                    "name": "baseline",
+                    "machines": [{"name": "press", "process_time": 3}],
+                },
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="duplicate scenario name: baseline"):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_negative_minutes(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "bad minutes",
+                    "minutes": -1,
+                    "machines": [{"name": "cutter", "process_time": 1}],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="minutes must be non-negative"):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_negative_arrival_rate(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "bad arrivals",
+                    "arrival_rate": -1,
+                    "machines": [{"name": "cutter", "process_time": 1}],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="arrival_rate must be non-negative"):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_missing_machine_name(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "missing machine name",
+                    "machines": [{"process_time": 1}],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="machine name is required"):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_missing_machine_process_time(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "missing process time",
+                    "machines": [{"name": "cutter"}],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="machine process_time is required"):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_non_positive_machine_process_time(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "bad process time",
+                    "machines": [{"name": "cutter", "process_time": 0}],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="machine process_time must be positive"):
+        load_multi_stage_scenarios(config_path)
