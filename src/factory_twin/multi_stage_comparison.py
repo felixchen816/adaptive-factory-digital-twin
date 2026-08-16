@@ -9,6 +9,10 @@ from factory_twin.line_analysis import (
     find_queue_bottleneck,
     recommend_line_action,
 )
+from factory_twin.improvement_plan import (
+    build_improvement_options,
+    choose_best_improvement,
+)
 from factory_twin.multi_stage import simulate_production_line
 
 
@@ -46,6 +50,13 @@ def compare_multi_stage_scenarios(
         queue_bottleneck = find_queue_bottleneck(final_queues)
         explanation = explain_queue_bottleneck(final_queues)
         recommendation = recommend_line_action(final_queues)
+        improvement_options = build_improvement_options(
+            scenario.line,
+            metrics,
+            scenario.minutes,
+            scenario.arrival_rate,
+        )
+        best_improvement = choose_best_improvement(improvement_options)
 
         completed = metrics["completed"]
         arrivals = metrics["arrivals"]
@@ -70,6 +81,8 @@ def compare_multi_stage_scenarios(
             "completion_rate": _safe_divide(completed, arrivals),
             "explanation": explanation,
             "recommendation": recommendation,
+            "improvement_options": improvement_options,
+            "best_improvement": best_improvement,
         }
         rows.append(row)
 

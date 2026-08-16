@@ -16,6 +16,11 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
             "bottleneck_machine": "press",
             "queue_bottleneck": "press",
             "recommendation": "Improve press capacity.",
+            "best_improvement": {
+                "summary": "Improve press by reducing process time.",
+                "completed_gain": 9,
+                "benefit_per_cost": 4.5,
+            },
         },
         {
             "scenario": "faster press",
@@ -30,6 +35,11 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
             "bottleneck_machine": "press",
             "queue_bottleneck": "press",
             "recommendation": "Monitor queue growth.",
+            "best_improvement": {
+                "summary": "Improve press by adding parallel capacity.",
+                "completed_gain": 6,
+                "benefit_per_cost": 2.0,
+            },
         },
     ]
 
@@ -44,6 +54,8 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
     assert "0.47" in report
     assert "Queue Bottleneck" in report
     assert "Improve press capacity." in report
+    assert "Best Improvement" in report
+    assert "Improve press by reducing process time." in report
 
 
 def test_build_multi_stage_report_formats_markdown_table():
@@ -61,6 +73,11 @@ def test_build_multi_stage_report_formats_markdown_table():
             "bottleneck_machine": "press",
             "queue_bottleneck": "press",
             "recommendation": "Improve press capacity.",
+            "best_improvement": {
+                "summary": "Improve press by reducing process time.",
+                "completed_gain": 9,
+                "benefit_per_cost": 4.5,
+            },
         }
     ]
 
@@ -69,3 +86,4 @@ def test_build_multi_stage_report_formats_markdown_table():
     assert "| Scenario | Completed | Arrivals | Completion Rate |" in report
     assert "| baseline | 19 | 60 |" in report
     assert "| 41 | 41 |" in report
+    assert "| Improve press by reducing process time. | 9 | 4.50 |" in report

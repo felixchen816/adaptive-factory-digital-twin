@@ -6,7 +6,7 @@ class Machine:
     """A production resource that processes one part at a fixed interval."""
 
     name: str
-    process_time: int
+    process_time: float
 
     def __post_init__(self):
         if not self.name:

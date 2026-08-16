@@ -5,7 +5,7 @@ throughput, finding bottlenecks, and comparing improvement scenarios.
 
 The project started as a one-machine queue simulator and now includes a
 multi-stage production line with internal queues, bottleneck diagnosis,
-scenario comparison, JSON export, and Markdown reporting.
+scenario comparison, improvement planning, JSON export, and Markdown reporting.
 
 ## One-Machine Simulator
 
@@ -78,6 +78,28 @@ Important multi-stage metrics:
 - `recommendation`: action such as improving a stage, reducing process time,
   adding parallel capacity, or reducing arrivals
 
+## Improvement Planning
+
+The project now scores possible actions for the queue bottleneck. For each
+multi-stage scenario, it estimates:
+
+- reducing the bottleneck machine process time
+- adding parallel capacity at the bottleneck stage
+- reducing arrivals to stop backlog growth
+
+Each option includes:
+
+- target stage
+- estimated completed-part gain
+- estimated WIP reduction
+- simple cost score
+- benefit per cost
+- plain-English summary
+
+The best improvement is the option with the highest benefit per cost. This is
+not a full financial model yet; it is a first decision-support layer that turns
+simulation output into a ranked next action.
+
 ## Scenario Comparison
 
 The demo compares multiple multi-stage scenarios:
@@ -97,6 +119,9 @@ Each comparison row includes:
 - queue bottleneck
 - total WIP
 - recommendation
+- best improvement plan
+- completed gain from the best improvement
+- benefit per cost
 
 The best multi-stage scenario is selected by:
 
@@ -193,6 +218,7 @@ src/factory_twin/
   line.py                     multi-stage production line model
   multi_stage.py              multi-stage queue simulator
   line_analysis.py            queue bottleneck analysis
+  improvement_plan.py         improvement option scoring
   multi_stage_comparison.py   multi-stage scenario comparison
   multi_stage_decision.py     multi-stage best-scenario selector
   multi_stage_report.py       multi-stage Markdown report
@@ -204,13 +230,12 @@ src/factory_twin/
 
 Next steps:
 
-- add summary metrics such as completion rate and largest queue
-- improve best-scenario scoring with completion rate
-- add richer multi-stage report columns
 - model parallel machines at one stage
 - add machine downtime or failure events
 - add charts for throughput, WIP, and queue growth
 - model scenario-specific improvement costs
+- support real cost inputs for each improvement option
+- compare recommended improvements against actual scenario configs
 
 ## Why This Project Matters
 

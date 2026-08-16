@@ -11,6 +11,10 @@ from factory_twin.comparison import compare_scenarios
 from factory_twin.config import load_multi_stage_scenarios
 from factory_twin.decision import choose_best_scenario
 from factory_twin.export import write_metrics_to_json, write_rows_to_csv
+from factory_twin.improvement_plan import (
+    build_improvement_options,
+    choose_best_improvement,
+)
 from factory_twin.line import ProductionLine
 from factory_twin.line_analysis import (
     explain_queue_bottleneck,
@@ -113,6 +117,13 @@ def main(argv=None):
     queue_bottleneck = find_queue_bottleneck(final_queues)
     queue_explanation = explain_queue_bottleneck(final_queues)
     line_recommendation = recommend_line_action(final_queues)
+    improvement_options = build_improvement_options(
+        THREE_STAGE_LINE,
+        multi_stage_metrics,
+        60,
+        1,
+    )
+    best_improvement = choose_best_improvement(improvement_options)
 
     print(
         f"Three-stage bottleneck: {THREE_STAGE_LINE.bottleneck_machine.name} "
@@ -135,7 +146,8 @@ def main(argv=None):
             f"completion_rate={row['completion_rate']:.2f}, "
             f"largest_queue={row['largest_final_queue']}, "
             f"bottleneck={row['queue_bottleneck']}, "
-            f"total_wip={row['total_wip']}"
+            f"total_wip={row['total_wip']}, "
+            f"best_improvement={_best_improvement_summary(row)}"
         )
     best_multi_stage = choose_best_multi_stage_scenario(ms_rows)
     print(f"Best multi-stage scenario: {best_multi_stage['scenario']}")
@@ -158,6 +170,8 @@ def main(argv=None):
         "total_wip": sum(final_queues.values()),
         "queue_bottleneck": queue_bottleneck,
         "recommendation": line_recommendation,
+        "improvement_options": improvement_options,
+        "best_improvement": best_improvement,
     }
 
     # Save multi-stage results JSON
@@ -191,6 +205,17 @@ def main(argv=None):
     with open(args.simple_report, "w", encoding="utf-8") as report_file:
         report_file.write(report)
     print(f"Wrote report to {args.simple_report.name}")
+
+
+def _best_improvement_summary(row):
+    best_improvement = row.get("best_improvement")
+    if not best_improvement:
+        return "No change needed."
+    return (
+        f"{best_improvement['summary']} "
+        f"(gain={best_improvement['completed_gain']}, "
+        f"benefit/cost={best_improvement['benefit_per_cost']:.2f})"
+    )
 
 
 if __name__ == "__main__":

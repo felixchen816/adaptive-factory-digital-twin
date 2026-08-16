@@ -101,6 +101,8 @@ def test_result_keys(sample_scenarios):
         "completion_rate",
         "explanation",
         "recommendation",
+        "improvement_options",
+        "best_improvement",
     }
     for row in results:
         assert expected_keys.issubset(row.keys())
@@ -139,3 +141,12 @@ def test_summary_metrics_handle_zero_completed_parts():
     assert row["arrivals"] == 0
     assert row["completion_rate"] == 0
     assert row["wip_per_completed_part"] == 0
+
+
+def test_rows_include_best_improvement_plan(sample_scenarios):
+    results = compare_multi_stage_scenarios(sample_scenarios)
+    baseline = {row["scenario"]: row for row in results}["baseline"]
+
+    assert baseline["best_improvement"]["target"] == "press"
+    assert baseline["best_improvement"]["completed_gain"] > 0
+    assert "Improve press" in baseline["best_improvement"]["summary"]
