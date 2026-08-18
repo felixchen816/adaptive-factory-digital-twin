@@ -150,3 +150,17 @@ def test_rows_include_best_improvement_plan(sample_scenarios):
     assert baseline["best_improvement"]["target"] == "press"
     assert baseline["best_improvement"]["completed_gain"] > 0
     assert "Improve press" in baseline["best_improvement"]["summary"]
+
+
+def test_scenario_costs_are_used_for_improvement_scoring(sample_scenarios):
+    scenario = sample_scenarios[0]
+    scenario.improvement_costs = {
+        "reduce_process_time": 10,
+        "add_parallel_capacity": 1,
+        "reduce_arrivals": 1,
+    }
+
+    row = compare_multi_stage_scenarios([scenario])[0]
+
+    assert row["best_improvement"]["option"] == "add parallel capacity"
+    assert row["best_improvement"]["cost"] == 1

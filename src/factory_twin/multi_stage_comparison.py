@@ -1,6 +1,6 @@
 """Multi-stage scenario comparison tools for production line configurations."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Sequence
 
 from factory_twin.line import ProductionLine
@@ -24,6 +24,7 @@ class MultiStageScenario:
     line: ProductionLine
     minutes: int = 60
     arrival_rate: float = 1.0
+    improvement_costs: dict = field(default_factory=dict)
 
 
 def compare_multi_stage_scenarios(
@@ -55,6 +56,7 @@ def compare_multi_stage_scenarios(
             metrics,
             scenario.minutes,
             scenario.arrival_rate,
+            scenario.improvement_costs,
         )
         best_improvement = choose_best_improvement(improvement_options)
 

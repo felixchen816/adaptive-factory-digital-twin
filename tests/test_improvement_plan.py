@@ -58,6 +58,35 @@ def test_best_improvement_prefers_highest_benefit_per_cost():
     )
 
 
+def test_custom_costs_can_change_best_improvement():
+    line = ProductionLine(
+        "baseline line",
+        [
+            Machine(name="cutter", process_time=1),
+            Machine(name="press", process_time=3),
+            Machine(name="inspector", process_time=2),
+        ],
+    )
+    metrics = {
+        "final_queue_lengths": {"cutter": 0, "press": 41, "inspector": 0},
+        "completed": 19,
+    }
+
+    options = build_improvement_options(
+        line,
+        metrics,
+        option_costs={
+            "reduce_process_time": 10,
+            "add_parallel_capacity": 1,
+            "reduce_arrivals": 1,
+        },
+    )
+    best = choose_best_improvement(options)
+
+    assert best["option"] == "add parallel capacity"
+    assert best["cost"] == 1
+
+
 def test_build_improvement_options_handles_no_queue_bottleneck():
     line = ProductionLine(
         "no demand line",

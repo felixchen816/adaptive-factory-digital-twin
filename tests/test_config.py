@@ -32,6 +32,7 @@ def test_load_multi_stage_scenarios_creates_scenario_objects(tmp_path):
     assert scenario.name == "baseline"
     assert scenario.minutes == 60
     assert scenario.arrival_rate == 1.0
+    assert scenario.improvement_costs == {}
     assert scenario.line.name == "baseline"
     assert [machine.name for machine in scenario.line.machines] == [
         "cutter",
@@ -39,6 +40,34 @@ def test_load_multi_stage_scenarios_creates_scenario_objects(tmp_path):
         "inspector",
     ]
     assert scenario.line.bottleneck_machine.name == "press"
+
+
+def test_load_multi_stage_scenarios_loads_improvement_costs(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "baseline",
+                    "machines": [{"name": "press", "process_time": 3}],
+                    "improvement_costs": {
+                        "reduce_process_time": 6,
+                        "add_parallel_capacity": 2,
+                        "reduce_arrivals": 1,
+                    },
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    scenario = load_multi_stage_scenarios(config_path)[0]
+
+    assert scenario.improvement_costs == {
+        "reduce_process_time": 6,
+        "add_parallel_capacity": 2,
+        "reduce_arrivals": 1,
+    }
 
 
 def test_load_multi_stage_scenarios_rejects_missing_name(tmp_path):
@@ -207,4 +236,45 @@ def test_load_multi_stage_scenarios_rejects_non_positive_machine_process_time(tm
     )
 
     with pytest.raises(ValueError, match="machine process_time must be positive"):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_non_object_improvement_costs(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "bad costs",
+                    "machines": [{"name": "press", "process_time": 3}],
+                    "improvement_costs": ["reduce_process_time"],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="improvement_costs must be an object"):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_non_positive_improvement_cost(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "bad costs",
+                    "machines": [{"name": "press", "process_time": 3}],
+                    "improvement_costs": {"reduce_process_time": 0},
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="improvement cost reduce_process_time must be positive",
+    ):
         load_multi_stage_scenarios(config_path)

@@ -7,7 +7,12 @@
       {"name": "cutter", "process_time": 1},
       {"name": "press", "process_time": 3},
       {"name": "inspector", "process_time": 2}
-    ]
+    ],
+    "improvement_costs": {
+      "reduce_process_time": 2,
+      "add_parallel_capacity": 4,
+      "reduce_arrivals": 1
+    }
   },
   {
     "name": "faster press",
@@ -17,7 +22,12 @@
       {"name": "cutter", "process_time": 1},
       {"name": "press", "process_time": 2},
       {"name": "inspector", "process_time": 2}
-    ]
+    ],
+    "improvement_costs": {
+      "reduce_process_time": 3,
+      "add_parallel_capacity": 5,
+      "reduce_arrivals": 1
+    }
   },
   {
     "name": "slow inspector",
@@ -27,7 +37,12 @@
       {"name": "cutter", "process_time": 1},
       {"name": "press", "process_time": 1},
       {"name": "inspector", "process_time": 4}
-    ]
+    ],
+    "improvement_costs": {
+      "reduce_process_time": 2,
+      "add_parallel_capacity": 3,
+      "reduce_arrivals": 1
+    }
   },
   {
     "name": "lower demand",
@@ -37,6 +52,11 @@
       {"name": "cutter", "process_time": 1},
       {"name": "press", "process_time": 3},
       {"name": "inspector", "process_time": 2}
-    ]
+    ],
+    "improvement_costs": {
+      "reduce_process_time": 2,
+      "add_parallel_capacity": 4,
+      "reduce_arrivals": 1
+    }
   }
 ]

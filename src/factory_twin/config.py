@@ -38,6 +38,10 @@ def _build_multi_stage_scenario(scenario_definition):
         "arrival_rate",
         1.0,
     )
+    improvement_costs = _optional_positive_number_map(
+        scenario_definition,
+        "improvement_costs",
+    )
 
     machine_definitions = scenario_definition.get("machines", [])
     if not isinstance(machine_definitions, list) or not machine_definitions:
@@ -54,6 +58,7 @@ def _build_multi_stage_scenario(scenario_definition):
         line=line,
         minutes=minutes,
         arrival_rate=arrival_rate,
+        improvement_costs=improvement_costs,
     )
 
 
@@ -97,6 +102,26 @@ def _required_positive_number(data, field_name, object_name):
     if not _is_number(value) or value <= 0:
         raise ValueError(f"{object_name} {field_name} must be positive")
     return value
+
+
+def _optional_positive_number_map(data, field_name):
+    if field_name not in data:
+        return {}
+
+    value = data[field_name]
+    if not isinstance(value, dict):
+        raise ValueError(f"{field_name} must be an object")
+
+    costs = {}
+    for cost_name, cost_value in value.items():
+        if not isinstance(cost_name, str) or not cost_name.strip():
+            raise ValueError("improvement cost name must be a non-empty string")
+        if not _is_number(cost_value) or cost_value <= 0:
+            raise ValueError(
+                f"improvement cost {cost_name} must be positive"
+            )
+        costs[cost_name.strip()] = cost_value
+    return costs
 
 
 def _is_number(value):

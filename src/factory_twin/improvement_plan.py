@@ -6,8 +6,15 @@ from factory_twin.machine import Machine
 from factory_twin.multi_stage import simulate_production_line
 
 
-def build_improvement_options(line, metrics, minutes=60, arrival_rate=1.0):
+def build_improvement_options(
+    line,
+    metrics,
+    minutes=60,
+    arrival_rate=1.0,
+    option_costs=None,
+):
     """Build scored improvement options for the largest queue bottleneck."""
+    option_costs = option_costs or {}
     final_queues = metrics.get("final_queue_lengths", {})
     if not final_queues or max(final_queues.values()) <= 0:
         return []
@@ -24,7 +31,7 @@ def build_improvement_options(line, metrics, minutes=60, arrival_rate=1.0):
         _score_option(
             option="reduce process time",
             target=target,
-            cost=2,
+            cost=_option_cost(option_costs, "reduce_process_time", 2),
             line=_line_with_machine_process_time(line, target, reduction=1),
             minutes=minutes,
             arrival_rate=arrival_rate,
@@ -37,7 +44,7 @@ def build_improvement_options(line, metrics, minutes=60, arrival_rate=1.0):
         _score_option(
             option="add parallel capacity",
             target=target,
-            cost=4,
+            cost=_option_cost(option_costs, "add_parallel_capacity", 4),
             line=_line_with_parallel_capacity(line, target),
             minutes=minutes,
             arrival_rate=arrival_rate,
@@ -50,7 +57,7 @@ def build_improvement_options(line, metrics, minutes=60, arrival_rate=1.0):
         _score_option(
             option="reduce arrivals",
             target=target,
-            cost=1,
+            cost=_option_cost(option_costs, "reduce_arrivals", 1),
             line=line,
             minutes=minutes,
             arrival_rate=arrival_rate * 0.8,
@@ -127,3 +134,7 @@ def _line_with_parallel_capacity(line, target):
             process_time = max(1, process_time - 1)
         machines.append(Machine(name=machine.name, process_time=process_time))
     return ProductionLine(f"{line.name} with parallel {target}", machines)
+
+
+def _option_cost(option_costs, option_name, default):
+    return option_costs.get(option_name, default)

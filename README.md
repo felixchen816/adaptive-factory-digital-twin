@@ -96,9 +96,10 @@ Each option includes:
 - benefit per cost
 - plain-English summary
 
-The best improvement is the option with the highest benefit per cost. This is
-not a full financial model yet; it is a first decision-support layer that turns
-simulation output into a ranked next action.
+The best improvement is the option with the highest benefit per cost. Scenario
+config files can override the default cost scores with `improvement_costs`.
+This is not a full financial model yet; it is a first decision-support layer
+that turns simulation output into a ranked next action.
 
 ## Scenario Comparison
 
@@ -179,7 +180,12 @@ non-empty `name` and at least one machine. `minutes` defaults to `60`, and
       {"name": "cutter", "process_time": 1},
       {"name": "press", "process_time": 3},
       {"name": "inspector", "process_time": 2}
-    ]
+    ],
+    "improvement_costs": {
+      "reduce_process_time": 2,
+      "add_parallel_capacity": 4,
+      "reduce_arrivals": 1
+    }
   }
 ]
 ```
@@ -195,6 +201,8 @@ Config validation rejects:
 - empty machine lists
 - missing machine names
 - missing or non-positive machine `process_time`
+- non-object `improvement_costs`
+- non-positive improvement cost values
 
 ## Run Tests
 
@@ -233,7 +241,6 @@ Next steps:
 - model parallel machines at one stage
 - add machine downtime or failure events
 - add charts for throughput, WIP, and queue growth
-- model scenario-specific improvement costs
 - support real cost inputs for each improvement option
 - compare recommended improvements against actual scenario configs
 
