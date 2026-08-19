@@ -79,9 +79,26 @@ def choose_best_improvement(options):
         key=lambda option: (
             option["benefit_per_cost"],
             option["completed_gain"],
-            option["wip_reduction"],
+            option.get("wip_reduction", 0),
         ),
     )
+
+
+def rank_improvement_options(options):
+    """Return improvement options sorted from strongest to weakest."""
+    ranked_options = sorted(
+        options,
+        key=lambda option: (
+            option["benefit_per_cost"],
+            option["completed_gain"],
+            option.get("wip_reduction", 0),
+        ),
+        reverse=True,
+    )
+    return [
+        {**option, "rank": index}
+        for index, option in enumerate(ranked_options, start=1)
+    ]
 
 
 def _score_option(

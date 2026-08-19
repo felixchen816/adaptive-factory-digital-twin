@@ -3,6 +3,7 @@ import pytest
 from factory_twin.improvement_plan import (
     build_improvement_options,
     choose_best_improvement,
+    rank_improvement_options,
 )
 from factory_twin.line import ProductionLine
 from factory_twin.machine import Machine
@@ -85,6 +86,23 @@ def test_custom_costs_can_change_best_improvement():
 
     assert best["option"] == "add parallel capacity"
     assert best["cost"] == 1
+
+
+def test_rank_improvement_options_orders_by_benefit_per_cost():
+    options = [
+        {"option": "low", "benefit_per_cost": 1, "completed_gain": 9},
+        {"option": "high", "benefit_per_cost": 3, "completed_gain": 1},
+        {"option": "middle", "benefit_per_cost": 2, "completed_gain": 5},
+    ]
+
+    ranked = rank_improvement_options(options)
+
+    assert [option["option"] for option in ranked] == [
+        "high",
+        "middle",
+        "low",
+    ]
+    assert [option["rank"] for option in ranked] == [1, 2, 3]
 
 
 def test_build_improvement_options_handles_no_queue_bottleneck():

@@ -12,6 +12,7 @@ from factory_twin.line_analysis import (
 from factory_twin.improvement_plan import (
     build_improvement_options,
     choose_best_improvement,
+    rank_improvement_options,
 )
 from factory_twin.multi_stage import simulate_production_line
 
@@ -58,7 +59,10 @@ def compare_multi_stage_scenarios(
             scenario.arrival_rate,
             scenario.improvement_costs,
         )
-        best_improvement = choose_best_improvement(improvement_options)
+        ranked_improvement_options = rank_improvement_options(
+            improvement_options
+        )
+        best_improvement = choose_best_improvement(ranked_improvement_options)
 
         completed = metrics["completed"]
         arrivals = metrics["arrivals"]
@@ -83,7 +87,7 @@ def compare_multi_stage_scenarios(
             "completion_rate": _safe_divide(completed, arrivals),
             "explanation": explanation,
             "recommendation": recommendation,
-            "improvement_options": improvement_options,
+            "improvement_options": ranked_improvement_options,
             "best_improvement": best_improvement,
         }
         rows.append(row)

@@ -27,6 +27,32 @@ def build_multi_stage_report(rows, best):
             f"{_format_number(_improvement_benefit_per_cost(row))} |"
         )
 
+    lines.extend(
+        [
+            "",
+            "## Ranked Improvement Options",
+            "",
+            "| Scenario | Rank | Option | Target | Cost | Completed Gain | WIP Reduction | Benefit/Cost |",
+            "| --- | ---: | --- | --- | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for row in rows:
+        improvement_options = row.get("improvement_options") or []
+        if not improvement_options:
+            lines.append(
+                f"| {row['scenario']} | 0 | No change needed. |  | 0 | 0 | 0 | 0 |"
+            )
+            continue
+
+        for option in improvement_options:
+            lines.append(
+                f"| {row['scenario']} | {option['rank']} | "
+                f"{option['option']} | {option['target']} | "
+                f"{option['cost']} | {option['completed_gain']} | "
+                f"{option['wip_reduction']} | "
+                f"{_format_number(option['benefit_per_cost'])} |"
+            )
+
     lines.append("")
     return "\n".join(lines)
 

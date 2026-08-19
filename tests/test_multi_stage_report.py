@@ -21,6 +21,28 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
                 "completed_gain": 9,
                 "benefit_per_cost": 4.5,
             },
+            "improvement_options": [
+                {
+                    "rank": 1,
+                    "option": "reduce process time",
+                    "target": "press",
+                    "cost": 2,
+                    "completed_gain": 9,
+                    "wip_reduction": 9,
+                    "benefit_per_cost": 4.5,
+                    "summary": "Improve press by reducing process time.",
+                },
+                {
+                    "rank": 2,
+                    "option": "add parallel capacity",
+                    "target": "press",
+                    "cost": 4,
+                    "completed_gain": 9,
+                    "wip_reduction": 9,
+                    "benefit_per_cost": 2.25,
+                    "summary": "Improve press by adding parallel capacity.",
+                },
+            ],
         },
         {
             "scenario": "faster press",
@@ -40,6 +62,7 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
                 "completed_gain": 6,
                 "benefit_per_cost": 2.0,
             },
+            "improvement_options": [],
         },
     ]
 
@@ -56,6 +79,8 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
     assert "Improve press capacity." in report
     assert "Best Improvement" in report
     assert "Improve press by reducing process time." in report
+    assert "## Ranked Improvement Options" in report
+    assert "| baseline | 1 | reduce process time | press | 2 | 9 | 9 | 4.50 |" in report
 
 
 def test_build_multi_stage_report_formats_markdown_table():
@@ -78,6 +103,18 @@ def test_build_multi_stage_report_formats_markdown_table():
                 "completed_gain": 9,
                 "benefit_per_cost": 4.5,
             },
+            "improvement_options": [
+                {
+                    "rank": 1,
+                    "option": "reduce process time",
+                    "target": "press",
+                    "cost": 2,
+                    "completed_gain": 9,
+                    "wip_reduction": 9,
+                    "benefit_per_cost": 4.5,
+                    "summary": "Improve press by reducing process time.",
+                }
+            ],
         }
     ]
 

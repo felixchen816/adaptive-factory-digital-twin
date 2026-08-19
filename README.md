@@ -101,6 +101,9 @@ config files can override the default cost scores with `improvement_costs`.
 This is not a full financial model yet; it is a first decision-support layer
 that turns simulation output into a ranked next action.
 
+The multi-stage report also includes a ranked improvement-options table so the
+best action can be compared against the other available options.
+
 ## Scenario Comparison
 
 The demo compares multiple multi-stage scenarios:
@@ -123,6 +126,7 @@ Each comparison row includes:
 - best improvement plan
 - completed gain from the best improvement
 - benefit per cost
+- ranked improvement options
 
 The best multi-stage scenario is selected by:
 
