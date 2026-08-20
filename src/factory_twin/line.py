@@ -66,7 +66,13 @@ class ProductionLine:
         process_time = float(process_time)
         if process_time <= 0:
             raise ValueError("process_time must be greater than zero.")
-        return 60.0 / process_time
+        return self._get_parallel_units(machine) * 60.0 / process_time
+
+    def _get_parallel_units(self, machine: Machine) -> int:
+        parallel_units = getattr(machine, "parallel_units", 1)
+        if not isinstance(parallel_units, int) or parallel_units <= 0:
+            raise ValueError("machine parallel_units must be greater than zero.")
+        return parallel_units
 
     def get_bottleneck(self) -> Machine:
         return self.bottleneck_machine

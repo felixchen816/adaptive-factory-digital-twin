@@ -45,8 +45,8 @@ Example line:
 cutter -> press -> inspector
 ```
 
-Each machine has a `process_time`. The slowest-capacity machine becomes the
-line-level `bottleneck_machine`.
+Each machine has a `process_time` and can optionally define `parallel_units`.
+The slowest-capacity stage becomes the line-level `bottleneck_machine`.
 
 For the example line:
 
@@ -57,6 +57,8 @@ inspector: 2 minutes per part
 ```
 
 The bottleneck machine is `press`, with a capacity of `20.0` parts/hour.
+If the press has `parallel_units: 2`, its effective capacity becomes `40.0`
+parts/hour because two press units can process parts at the same interval.
 
 ## Bottleneck Analysis
 
@@ -109,7 +111,7 @@ best action can be compared against the other available options.
 The demo compares multiple multi-stage scenarios:
 
 - `baseline`: cutter 1, press 3, inspector 2
-- `faster press`: cutter 1, press 2, inspector 2
+- `faster press`: cutter 1, press 3 with two parallel units, inspector 2
 - `slow inspector`: cutter 1, press 1, inspector 4
 - `lower demand`: baseline line with lower arrival rate
 
@@ -172,7 +174,7 @@ To use a different multi-stage scenario file or output location:
 
 Multi-stage scenario config files are JSON lists. Each scenario requires a
 non-empty `name` and at least one machine. `minutes` defaults to `60`, and
-`arrival_rate` defaults to `1.0`.
+`arrival_rate` defaults to `1.0`. Each machine defaults to one parallel unit.
 
 ```json
 [
@@ -182,7 +184,7 @@ non-empty `name` and at least one machine. `minutes` defaults to `60`, and
     "arrival_rate": 1.0,
     "machines": [
       {"name": "cutter", "process_time": 1},
-      {"name": "press", "process_time": 3},
+      {"name": "press", "process_time": 3, "parallel_units": 2},
       {"name": "inspector", "process_time": 2}
     ],
     "improvement_costs": {
@@ -205,6 +207,7 @@ Config validation rejects:
 - empty machine lists
 - missing machine names
 - missing or non-positive machine `process_time`
+- non-positive machine `parallel_units`
 - non-object `improvement_costs`
 - non-positive improvement cost values
 
@@ -242,7 +245,6 @@ src/factory_twin/
 
 Next steps:
 
-- model parallel machines at one stage
 - add machine downtime or failure events
 - add charts for throughput, WIP, and queue growth
 - support real cost inputs for each improvement option

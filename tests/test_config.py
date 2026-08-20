@@ -39,7 +39,32 @@ def test_load_multi_stage_scenarios_creates_scenario_objects(tmp_path):
         "press",
         "inspector",
     ]
+    assert [machine.parallel_units for machine in scenario.line.machines] == [1, 1, 1]
     assert scenario.line.bottleneck_machine.name == "press"
+
+
+def test_load_multi_stage_scenarios_loads_parallel_units(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "parallel press",
+                    "machines": [
+                        {"name": "cutter", "process_time": 1},
+                        {"name": "press", "process_time": 3, "parallel_units": 2},
+                        {"name": "inspector", "process_time": 2},
+                    ],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    scenario = load_multi_stage_scenarios(config_path)[0]
+
+    assert scenario.line.machines[1].parallel_units == 2
+    assert scenario.line.bottleneck_machine.name == "inspector"
 
 
 def test_load_multi_stage_scenarios_loads_improvement_costs(tmp_path):
@@ -236,6 +261,30 @@ def test_load_multi_stage_scenarios_rejects_non_positive_machine_process_time(tm
     )
 
     with pytest.raises(ValueError, match="machine process_time must be positive"):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_non_positive_parallel_units(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "bad parallel units",
+                    "machines": [
+                        {
+                            "name": "press",
+                            "process_time": 3,
+                            "parallel_units": 0,
+                        }
+                    ],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="machine parallel_units must be positive"):
         load_multi_stage_scenarios(config_path)
 
 

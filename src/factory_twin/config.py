@@ -72,7 +72,17 @@ def _build_machine(machine_definition):
         "process_time",
         "machine",
     )
-    return Machine(name=name, process_time=process_time)
+    parallel_units = _optional_positive_integer(
+        machine_definition,
+        "parallel_units",
+        1,
+        "machine",
+    )
+    return Machine(
+        name=name,
+        process_time=process_time,
+        parallel_units=parallel_units,
+    )
 
 
 def _required_non_empty_string(data, field_name, object_name):
@@ -100,6 +110,16 @@ def _required_positive_number(data, field_name, object_name):
 
     value = data[field_name]
     if not _is_number(value) or value <= 0:
+        raise ValueError(f"{object_name} {field_name} must be positive")
+    return value
+
+
+def _optional_positive_integer(data, field_name, default, object_name):
+    if field_name not in data:
+        return default
+
+    value = data[field_name]
+    if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
         raise ValueError(f"{object_name} {field_name} must be positive")
     return value
 

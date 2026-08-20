@@ -139,17 +139,29 @@ def _line_with_machine_process_time(line, target, reduction):
         process_time = machine.process_time
         if machine.name == target:
             process_time = max(1, process_time - reduction)
-        machines.append(Machine(name=machine.name, process_time=process_time))
+        machines.append(
+            Machine(
+                name=machine.name,
+                process_time=process_time,
+                parallel_units=machine.parallel_units,
+            )
+        )
     return ProductionLine(f"{line.name} with faster {target}", machines)
 
 
 def _line_with_parallel_capacity(line, target):
     machines = []
     for machine in line.machines:
-        process_time = machine.process_time
+        parallel_units = machine.parallel_units
         if machine.name == target:
-            process_time = max(1, process_time - 1)
-        machines.append(Machine(name=machine.name, process_time=process_time))
+            parallel_units += 1
+        machines.append(
+            Machine(
+                name=machine.name,
+                process_time=machine.process_time,
+                parallel_units=parallel_units,
+            )
+        )
     return ProductionLine(f"{line.name} with parallel {target}", machines)
 
 

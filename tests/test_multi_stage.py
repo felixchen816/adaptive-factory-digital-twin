@@ -56,6 +56,27 @@ def test_simulate_production_line_tracks_max_queue_lengths():
     assert metrics["max_queue_lengths"]["press"] >= metrics["final_queue_lengths"]["press"]
 
 
+def test_parallel_stage_processes_multiple_parts_at_a_time():
+    baseline = make_three_stage_line()
+    parallel_press = ProductionLine(
+        "parallel press line",
+        [
+            Machine("cutter", 1),
+            Machine("press", 3, parallel_units=2),
+            Machine("inspector", 2),
+        ],
+    )
+
+    baseline_metrics = simulate_production_line(baseline, 60, 1)
+    parallel_metrics = simulate_production_line(parallel_press, 60, 1)
+
+    assert parallel_metrics["completed"] > baseline_metrics["completed"]
+    assert (
+        parallel_metrics["final_queue_lengths"]["press"]
+        < baseline_metrics["final_queue_lengths"]["press"]
+    )
+
+
 def test_simulate_production_line_rejects_invalid_inputs():
     line = make_three_stage_line()
 

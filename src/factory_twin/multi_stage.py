@@ -21,14 +21,16 @@ def simulate_production_line(line, minutes, arrival_rate):
         for stage_index in reversed(range(len(machines))):
             machine = machines[stage_index]
             process_time = _get_process_time(machine)
+            parallel_units = _get_parallel_units(machine)
 
             if queues[stage_index] >= 1 and minute % process_time == 0:
-                queues[stage_index] -= 1
+                processed_parts = min(int(queues[stage_index]), parallel_units)
+                queues[stage_index] -= processed_parts
 
                 if stage_index == len(machines) - 1:
-                    completed += 1
+                    completed += processed_parts
                 else:
-                    queues[stage_index + 1] += 1
+                    queues[stage_index + 1] += processed_parts
 
         for stage_index, queue_length in enumerate(queues):
             max_queue_lengths[stage_index] = max(
@@ -61,6 +63,13 @@ def _get_process_time(machine):
     if process_time <= 0:
         raise ValueError("process_time must be positive")
     return process_time
+
+
+def _get_parallel_units(machine):
+    parallel_units = getattr(machine, "parallel_units", 1)
+    if not isinstance(parallel_units, int) or parallel_units <= 0:
+        raise ValueError("parallel_units must be positive")
+    return parallel_units
 
 
 def _stage_dict(machines, values):

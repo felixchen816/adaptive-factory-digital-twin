@@ -157,3 +157,14 @@ def test_named_production_line_reports_bottleneck_capacity_per_hour():
     assert line.bottleneck_machine is press
     assert line.bottleneck_process_time == 3
     assert line.capacity_per_hour == 20.0
+
+
+def test_parallel_units_increase_machine_capacity():
+    cutter = Machine(name="cutter", process_time=1)
+    press = Machine(name="press", process_time=3, parallel_units=2)
+    inspector = Machine(name="inspector", process_time=2)
+
+    line = Line("parallel press line", [cutter, press, inspector])
+
+    assert line.bottleneck_machine is inspector
+    assert line.capacity_per_hour == 30.0
