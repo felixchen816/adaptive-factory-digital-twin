@@ -144,6 +144,7 @@ def _line_with_machine_process_time(line, target, reduction):
                 name=machine.name,
                 process_time=process_time,
                 parallel_units=machine.parallel_units,
+                downtime_minutes=machine.downtime_minutes,
             )
         )
     return ProductionLine(f"{line.name} with faster {target}", machines)
@@ -160,6 +161,7 @@ def _line_with_parallel_capacity(line, target):
                 name=machine.name,
                 process_time=machine.process_time,
                 parallel_units=parallel_units,
+                downtime_minutes=machine.downtime_minutes,
             )
         )
     return ProductionLine(f"{line.name} with parallel {target}", machines)

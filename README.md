@@ -75,10 +75,17 @@ Important multi-stage metrics:
 
 - `final_queue_lengths`: queue length at each stage after the simulation
 - `max_queue_lengths`: largest queue reached at each stage
+- `queue_history`: queue lengths by minute for future charting
+- `completed_history`: cumulative completed parts by minute
+- `downtime_events`: downtime minutes counted by machine
 - `total_wip`: total work in process left in the line
 - `line_capacity_per_hour`: capacity of the bottleneck machine
 - `recommendation`: action such as improving a stage, reducing process time,
   adding parallel capacity, or reducing arrivals
+
+Machines can define planned downtime with `downtime_minutes`. A machine does
+not process parts during those minutes, which makes it possible to test simple
+failure or maintenance events.
 
 ## Improvement Planning
 
@@ -184,7 +191,12 @@ non-empty `name` and at least one machine. `minutes` defaults to `60`, and
     "arrival_rate": 1.0,
     "machines": [
       {"name": "cutter", "process_time": 1},
-      {"name": "press", "process_time": 3, "parallel_units": 2},
+      {
+        "name": "press",
+        "process_time": 3,
+        "parallel_units": 2,
+        "downtime_minutes": [15, 30]
+      },
       {"name": "inspector", "process_time": 2}
     ],
     "improvement_costs": {
@@ -208,6 +220,7 @@ Config validation rejects:
 - missing machine names
 - missing or non-positive machine `process_time`
 - non-positive machine `parallel_units`
+- non-list or negative machine `downtime_minutes`
 - non-object `improvement_costs`
 - non-positive improvement cost values
 
@@ -245,7 +258,6 @@ src/factory_twin/
 
 Next steps:
 
-- add machine downtime or failure events
 - add charts for throughput, WIP, and queue growth
 - support real cost inputs for each improvement option
 - compare recommended improvements against actual scenario configs

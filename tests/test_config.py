@@ -67,6 +67,31 @@ def test_load_multi_stage_scenarios_loads_parallel_units(tmp_path):
     assert scenario.line.bottleneck_machine.name == "inspector"
 
 
+def test_load_multi_stage_scenarios_loads_downtime_minutes(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "press downtime",
+                    "machines": [
+                        {
+                            "name": "press",
+                            "process_time": 3,
+                            "downtime_minutes": [6, 9],
+                        }
+                    ],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    scenario = load_multi_stage_scenarios(config_path)[0]
+
+    assert scenario.line.machines[0].downtime_minutes == (6, 9)
+
+
 def test_load_multi_stage_scenarios_loads_improvement_costs(tmp_path):
     config_path = tmp_path / "scenarios.json"
     config_path.write_text(
@@ -285,6 +310,30 @@ def test_load_multi_stage_scenarios_rejects_non_positive_parallel_units(tmp_path
     )
 
     with pytest.raises(ValueError, match="machine parallel_units must be positive"):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_negative_downtime_minutes(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "bad downtime",
+                    "machines": [
+                        {
+                            "name": "press",
+                            "process_time": 3,
+                            "downtime_minutes": [-1],
+                        }
+                    ],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="machine downtime_minutes must be non-negative integers"):
         load_multi_stage_scenarios(config_path)
 
 

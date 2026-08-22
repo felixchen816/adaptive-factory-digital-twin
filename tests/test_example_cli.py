@@ -51,3 +51,10 @@ def test_example_accepts_config_and_output_paths(tmp_path):
     exported_metrics = json.loads(multi_stage_json.read_text(encoding="utf-8"))
     assert exported_metrics["best_improvement"]["target"] == "press"
     assert exported_metrics["best_improvement"]["completed_gain"] > 0
+    assert len(exported_metrics["queue_history"]) == 60
+    assert exported_metrics["completed_history"][-1]["completed"] == exported_metrics["completed"]
+    assert exported_metrics["downtime_events"] == {
+        "cutter": 0,
+        "press": 0,
+        "inspector": 0,
+    }

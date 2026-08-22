@@ -77,6 +77,35 @@ def test_parallel_stage_processes_multiple_parts_at_a_time():
     )
 
 
+def test_machine_downtime_reduces_completed_parts():
+    baseline = make_three_stage_line()
+    press_down = ProductionLine(
+        "press downtime line",
+        [
+            Machine("cutter", 1),
+            Machine("press", 3, downtime_minutes=(0, 3, 6, 9)),
+            Machine("inspector", 2),
+        ],
+    )
+
+    baseline_metrics = simulate_production_line(baseline, 60, 1)
+    downtime_metrics = simulate_production_line(press_down, 60, 1)
+
+    assert downtime_metrics["completed"] < baseline_metrics["completed"]
+    assert downtime_metrics["downtime_events"]["press"] == 4
+
+
+def test_simulation_returns_queue_and_completed_history():
+    line = make_three_stage_line()
+
+    metrics = simulate_production_line(line, 5, 1)
+
+    assert len(metrics["queue_history"]) == 5
+    assert len(metrics["completed_history"]) == 5
+    assert set(metrics["queue_history"][0]) == {"minute", "cutter", "press", "inspector"}
+    assert metrics["completed_history"][-1]["completed"] == metrics["completed"]
+
+
 def test_simulate_production_line_rejects_invalid_inputs():
     line = make_three_stage_line()
 

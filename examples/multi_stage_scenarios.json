@@ -20,7 +20,12 @@
     "arrival_rate": 1.0,
     "machines": [
       {"name": "cutter", "process_time": 1},
-      {"name": "press", "process_time": 3, "parallel_units": 2},
+      {
+        "name": "press",
+        "process_time": 3,
+        "parallel_units": 2,
+        "downtime_minutes": [15, 30]
+      },
       {"name": "inspector", "process_time": 2}
     ],
     "improvement_costs": {

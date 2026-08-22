@@ -78,10 +78,17 @@ def _build_machine(machine_definition):
         1,
         "machine",
     )
+    downtime_minutes = _optional_non_negative_integer_tuple(
+        machine_definition,
+        "downtime_minutes",
+        (),
+        "machine",
+    )
     return Machine(
         name=name,
         process_time=process_time,
         parallel_units=parallel_units,
+        downtime_minutes=downtime_minutes,
     )
 
 
@@ -122,6 +129,26 @@ def _optional_positive_integer(data, field_name, default, object_name):
     if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
         raise ValueError(f"{object_name} {field_name} must be positive")
     return value
+
+
+def _optional_non_negative_integer_tuple(data, field_name, default, object_name):
+    if field_name not in data:
+        return default
+
+    value = data[field_name]
+    if not isinstance(value, list):
+        raise ValueError(
+            f"{object_name} {field_name} must be non-negative integers"
+        )
+
+    if not all(
+        isinstance(item, int) and not isinstance(item, bool) and item >= 0
+        for item in value
+    ):
+        raise ValueError(
+            f"{object_name} {field_name} must be non-negative integers"
+        )
+    return tuple(value)
 
 
 def _optional_positive_number_map(data, field_name):
