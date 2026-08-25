@@ -103,6 +103,7 @@ def test_result_keys(sample_scenarios):
         "recommendation",
         "improvement_options",
         "best_improvement",
+        "matching_scenario",
     }
     for row in results:
         assert expected_keys.issubset(row.keys())
@@ -164,3 +165,10 @@ def test_scenario_costs_are_used_for_improvement_scoring(sample_scenarios):
 
     assert row["best_improvement"]["option"] == "add parallel capacity"
     assert row["best_improvement"]["cost"] == 1
+
+
+def test_comparison_matches_recommendation_to_existing_scenario(sample_scenarios):
+    results = compare_multi_stage_scenarios(sample_scenarios)
+    baseline = {row["scenario"]: row for row in results}["baseline"]
+
+    assert baseline["matching_scenario"] == "faster press"

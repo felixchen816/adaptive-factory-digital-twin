@@ -144,6 +144,9 @@ The best multi-stage scenario is selected by:
 3. lowest total WIP as the next tie-breaker
 4. lowest largest max queue as the final tie-breaker
 
+Comparison rows also include `matching_scenario` when an existing scenario
+already reaches or beats the expected result of the recommended improvement.
+
 ## Reports and Exports
 
 The demo generates these local output files:
@@ -152,6 +155,7 @@ The demo generates these local output files:
 - `simple_line_report.md`
 - `multi_stage_results.json`
 - `multi_stage_report.md`
+- `multi_stage_history.csv`
 
 These files are ignored by git because they are generated artifacts.
 
@@ -174,7 +178,8 @@ To use a different multi-stage scenario file or output location:
 .venv/bin/python examples/run_simple_line.py \
   --multi-stage-config examples/multi_stage_scenarios.json \
   --multi-stage-json multi_stage_results.json \
-  --multi-stage-report multi_stage_report.md
+  --multi-stage-report multi_stage_report.md \
+  --multi-stage-history-csv multi_stage_history.csv
 ```
 
 ## Scenario Config Format
@@ -203,10 +208,17 @@ non-empty `name` and at least one machine. `minutes` defaults to `60`, and
       "reduce_process_time": 2,
       "add_parallel_capacity": 4,
       "reduce_arrivals": 1
+    },
+    "improvement_values": {
+      "completed_part": 5
     }
   }
 ]
 ```
+
+`improvement_values.completed_part` is a simple value per additional completed
+part. The planner uses it to estimate total value and net value for each
+improvement option.
 
 Config validation rejects:
 
@@ -223,6 +235,8 @@ Config validation rejects:
 - non-list or negative machine `downtime_minutes`
 - non-object `improvement_costs`
 - non-positive improvement cost values
+- non-object `improvement_values`
+- negative improvement value entries
 
 ## Run Tests
 
@@ -259,7 +273,6 @@ src/factory_twin/
 Next steps:
 
 - add charts for throughput, WIP, and queue growth
-- support real cost inputs for each improvement option
 - compare recommended improvements against actual scenario configs
 
 ## Why This Project Matters

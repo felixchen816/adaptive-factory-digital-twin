@@ -33,6 +33,7 @@ def test_load_multi_stage_scenarios_creates_scenario_objects(tmp_path):
     assert scenario.minutes == 60
     assert scenario.arrival_rate == 1.0
     assert scenario.improvement_costs == {}
+    assert scenario.improvement_values == {}
     assert scenario.line.name == "baseline"
     assert [machine.name for machine in scenario.line.machines] == [
         "cutter",
@@ -118,6 +119,26 @@ def test_load_multi_stage_scenarios_loads_improvement_costs(tmp_path):
         "add_parallel_capacity": 2,
         "reduce_arrivals": 1,
     }
+
+
+def test_load_multi_stage_scenarios_loads_improvement_values(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "baseline",
+                    "machines": [{"name": "press", "process_time": 3}],
+                    "improvement_values": {"completed_part": 5},
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    scenario = load_multi_stage_scenarios(config_path)[0]
+
+    assert scenario.improvement_values == {"completed_part": 5}
 
 
 def test_load_multi_stage_scenarios_rejects_missing_name(tmp_path):
@@ -374,5 +395,27 @@ def test_load_multi_stage_scenarios_rejects_non_positive_improvement_cost(tmp_pa
     with pytest.raises(
         ValueError,
         match="improvement cost reduce_process_time must be positive",
+    ):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_negative_improvement_value(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "bad values",
+                    "machines": [{"name": "press", "process_time": 3}],
+                    "improvement_values": {"completed_part": -1},
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="improvement value completed_part must be non-negative",
     ):
         load_multi_stage_scenarios(config_path)

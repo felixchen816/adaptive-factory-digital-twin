@@ -10,7 +10,11 @@ if str(SRC_DIR) not in sys.path:
 from factory_twin.comparison import compare_scenarios
 from factory_twin.config import load_multi_stage_scenarios
 from factory_twin.decision import choose_best_scenario
-from factory_twin.export import write_metrics_to_json, write_rows_to_csv
+from factory_twin.export import (
+    write_metrics_to_json,
+    write_rows_to_csv,
+    write_time_series_to_csv,
+)
 from factory_twin.improvement_plan import (
     build_improvement_options,
     choose_best_improvement,
@@ -90,6 +94,12 @@ def parse_args(argv=None):
         default=REPO_ROOT / "multi_stage_report.md",
         type=Path,
         help="Output path for the multi-stage Markdown report.",
+    )
+    parser.add_argument(
+        "--multi-stage-history-csv",
+        default=REPO_ROOT / "multi_stage_history.csv",
+        type=Path,
+        help="Output path for multi-stage queue and throughput history.",
     )
     parser.add_argument(
         "--simple-csv",
@@ -180,6 +190,12 @@ def main(argv=None):
     # Save multi-stage results JSON
     write_metrics_to_json(multi_stage_results, args.multi_stage_json)
     print(f"\nWrote results to {args.multi_stage_json.name}")
+    write_time_series_to_csv(
+        multi_stage_metrics["queue_history"],
+        multi_stage_metrics["completed_history"],
+        args.multi_stage_history_csv,
+    )
+    print(f"Wrote history to {args.multi_stage_history_csv.name}")
 
     for row in rows:
         print(f"\nScenario: {row['scenario']}")

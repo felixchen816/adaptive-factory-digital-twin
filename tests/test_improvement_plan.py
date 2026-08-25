@@ -88,6 +88,35 @@ def test_custom_costs_can_change_best_improvement():
     assert best["cost"] == 1
 
 
+def test_improvement_values_add_estimated_and_net_value():
+    line = ProductionLine(
+        "baseline line",
+        [
+            Machine(name="cutter", process_time=1),
+            Machine(name="press", process_time=3),
+            Machine(name="inspector", process_time=2),
+        ],
+    )
+    metrics = {
+        "final_queue_lengths": {"cutter": 0, "press": 41, "inspector": 0},
+        "completed": 19,
+    }
+
+    options = build_improvement_options(
+        line,
+        metrics,
+        option_costs={"reduce_process_time": 20},
+        option_values={"completed_part": 5},
+    )
+    faster_press = [
+        option for option in options
+        if option["option"] == "reduce process time"
+    ][0]
+
+    assert faster_press["estimated_value"] == faster_press["completed_gain"] * 5
+    assert faster_press["net_value"] == faster_press["estimated_value"] - 20
+
+
 def test_rank_improvement_options_orders_by_benefit_per_cost():
     options = [
         {"option": "low", "benefit_per_cost": 1, "completed_gain": 9},

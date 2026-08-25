@@ -9,8 +9,8 @@ def build_multi_stage_report(rows, best):
         "",
         "## Scenario Results",
         "",
-        "| Scenario | Completed | Arrivals | Completion Rate | Throughput/hr | Total WIP | Largest Final Queue | Largest Max Queue | WIP/Completed | Bottleneck Machine | Queue Bottleneck | Recommendation | Best Improvement | Completed Gain | Benefit/Cost |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | --- | ---: | ---: |",
+        "| Scenario | Completed | Arrivals | Completion Rate | Throughput/hr | Total WIP | Largest Final Queue | Largest Max Queue | WIP/Completed | Bottleneck Machine | Queue Bottleneck | Recommendation | Best Improvement | Completed Gain | Benefit/Cost | Matching Scenario |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | --- | ---: | ---: | --- |",
     ]
 
     for row in rows:
@@ -24,7 +24,8 @@ def build_multi_stage_report(rows, best):
             f"{row['bottleneck_machine']} | {row['queue_bottleneck']} | "
             f"{row['recommendation']} | "
             f"{_improvement_summary(row)} | {_improvement_gain(row)} | "
-            f"{_format_number(_improvement_benefit_per_cost(row))} |"
+            f"{_format_number(_improvement_benefit_per_cost(row))} | "
+            f"{_matching_scenario(row)} |"
         )
 
     lines.extend(
@@ -32,15 +33,15 @@ def build_multi_stage_report(rows, best):
             "",
             "## Ranked Improvement Options",
             "",
-            "| Scenario | Rank | Option | Target | Cost | Completed Gain | WIP Reduction | Benefit/Cost |",
-            "| --- | ---: | --- | --- | ---: | ---: | ---: | ---: |",
+            "| Scenario | Rank | Option | Target | Cost | Completed Gain | WIP Reduction | Benefit/Cost | Estimated Value | Net Value |",
+            "| --- | ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
         ]
     )
     for row in rows:
         improvement_options = row.get("improvement_options") or []
         if not improvement_options:
             lines.append(
-                f"| {row['scenario']} | 0 | No change needed. |  | 0 | 0 | 0 | 0 |"
+                f"| {row['scenario']} | 0 | No change needed. |  | 0 | 0 | 0 | 0 | 0 | 0 |"
             )
             continue
 
@@ -50,7 +51,9 @@ def build_multi_stage_report(rows, best):
                 f"{option['option']} | {option['target']} | "
                 f"{option['cost']} | {option['completed_gain']} | "
                 f"{option['wip_reduction']} | "
-                f"{_format_number(option['benefit_per_cost'])} |"
+                f"{_format_number(option['benefit_per_cost'])} | "
+                f"{_format_number(option.get('estimated_value', 0))} | "
+                f"{_format_number(option.get('net_value', 0))} |"
             )
 
     lines.append("")
@@ -82,3 +85,7 @@ def _improvement_benefit_per_cost(row):
     if not best_improvement:
         return 0
     return best_improvement["benefit_per_cost"]
+
+
+def _matching_scenario(row):
+    return row.get("matching_scenario") or "None"

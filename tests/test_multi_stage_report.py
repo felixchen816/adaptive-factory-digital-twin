@@ -20,7 +20,10 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
                 "summary": "Improve press by reducing process time.",
                 "completed_gain": 9,
                 "benefit_per_cost": 4.5,
+                "estimated_value": 45,
+                "net_value": 43,
             },
+            "matching_scenario": "faster press",
             "improvement_options": [
                 {
                     "rank": 1,
@@ -30,6 +33,8 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
                     "completed_gain": 9,
                     "wip_reduction": 9,
                     "benefit_per_cost": 4.5,
+                    "estimated_value": 45,
+                    "net_value": 43,
                     "summary": "Improve press by reducing process time.",
                 },
                 {
@@ -40,6 +45,8 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
                     "completed_gain": 9,
                     "wip_reduction": 9,
                     "benefit_per_cost": 2.25,
+                    "estimated_value": 45,
+                    "net_value": 41,
                     "summary": "Improve press by adding parallel capacity.",
                 },
             ],
@@ -61,7 +68,10 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
                 "summary": "Improve press by adding parallel capacity.",
                 "completed_gain": 6,
                 "benefit_per_cost": 2.0,
+                "estimated_value": 30,
+                "net_value": 26,
             },
+            "matching_scenario": None,
             "improvement_options": [],
         },
     ]
@@ -80,7 +90,8 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
     assert "Best Improvement" in report
     assert "Improve press by reducing process time." in report
     assert "## Ranked Improvement Options" in report
-    assert "| baseline | 1 | reduce process time | press | 2 | 9 | 9 | 4.50 |" in report
+    assert "Matching Scenario" in report
+    assert "| baseline | 1 | reduce process time | press | 2 | 9 | 9 | 4.50 | 45 | 43 |" in report
 
 
 def test_build_multi_stage_report_formats_markdown_table():
@@ -102,7 +113,10 @@ def test_build_multi_stage_report_formats_markdown_table():
                 "summary": "Improve press by reducing process time.",
                 "completed_gain": 9,
                 "benefit_per_cost": 4.5,
+                "estimated_value": 45,
+                "net_value": 43,
             },
+            "matching_scenario": "faster press",
             "improvement_options": [
                 {
                     "rank": 1,
@@ -112,6 +126,8 @@ def test_build_multi_stage_report_formats_markdown_table():
                     "completed_gain": 9,
                     "wip_reduction": 9,
                     "benefit_per_cost": 4.5,
+                    "estimated_value": 45,
+                    "net_value": 43,
                     "summary": "Improve press by reducing process time.",
                 }
             ],

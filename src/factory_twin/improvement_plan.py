@@ -12,9 +12,11 @@ def build_improvement_options(
     minutes=60,
     arrival_rate=1.0,
     option_costs=None,
+    option_values=None,
 ):
     """Build scored improvement options for the largest queue bottleneck."""
     option_costs = option_costs or {}
+    option_values = option_values or {}
     final_queues = metrics.get("final_queue_lengths", {})
     if not final_queues or max(final_queues.values()) <= 0:
         return []
@@ -37,6 +39,11 @@ def build_improvement_options(
             arrival_rate=arrival_rate,
             before_completed=before_completed,
             before_wip=before_wip,
+            value_per_completed_part=_option_value(
+                option_values,
+                "completed_part",
+                0,
+            ),
             summary=f"Improve {target} by reducing process time.",
         )
     )
@@ -50,6 +57,11 @@ def build_improvement_options(
             arrival_rate=arrival_rate,
             before_completed=before_completed,
             before_wip=before_wip,
+            value_per_completed_part=_option_value(
+                option_values,
+                "completed_part",
+                0,
+            ),
             summary=f"Improve {target} by adding parallel capacity.",
         )
     )
@@ -63,6 +75,11 @@ def build_improvement_options(
             arrival_rate=arrival_rate * 0.8,
             before_completed=before_completed,
             before_wip=before_wip,
+            value_per_completed_part=_option_value(
+                option_values,
+                "completed_part",
+                0,
+            ),
             summary=f"Reduce arrivals so {target} stops accumulating work.",
         )
     )
@@ -110,6 +127,7 @@ def _score_option(
     arrival_rate,
     before_completed,
     before_wip,
+    value_per_completed_part,
     summary,
 ):
     after_metrics = simulate_production_line(line, minutes, arrival_rate)
@@ -117,6 +135,7 @@ def _score_option(
     after_wip = after_metrics["total_wip"]
     completed_gain = after_completed - before_completed
     wip_reduction = before_wip - after_wip
+    estimated_value = completed_gain * value_per_completed_part
 
     return {
         "option": option,
@@ -129,6 +148,8 @@ def _score_option(
         "after_wip": after_wip,
         "wip_reduction": wip_reduction,
         "benefit_per_cost": completed_gain / cost,
+        "estimated_value": estimated_value,
+        "net_value": estimated_value - cost,
         "summary": summary,
     }
 
@@ -169,3 +190,7 @@ def _line_with_parallel_capacity(line, target):
 
 def _option_cost(option_costs, option_name, default):
     return option_costs.get(option_name, default)
+
+
+def _option_value(option_values, value_name, default):
+    return option_values.get(value_name, default)

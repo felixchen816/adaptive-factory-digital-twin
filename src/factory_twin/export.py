@@ -27,3 +27,21 @@ def write_metrics_to_json(metrics, output_path):
 
     with open(output_path, "w", encoding="utf-8") as json_file:
         json.dump(metrics, json_file, indent=4)
+
+
+def write_time_series_to_csv(queue_history, completed_history, output_path):
+    """Write queue and completed histories to a single CSV file."""
+    if not queue_history:
+        return
+
+    completed_by_minute = {
+        row["minute"]: row["completed"]
+        for row in completed_history
+    }
+    rows = []
+    for queue_row in queue_history:
+        row = dict(queue_row)
+        row["completed"] = completed_by_minute.get(row["minute"], 0)
+        rows.append(row)
+
+    write_rows_to_csv(rows, output_path)

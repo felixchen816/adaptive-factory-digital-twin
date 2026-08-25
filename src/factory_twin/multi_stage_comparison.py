@@ -26,6 +26,7 @@ class MultiStageScenario:
     minutes: int = 60
     arrival_rate: float = 1.0
     improvement_costs: dict = field(default_factory=dict)
+    improvement_values: dict = field(default_factory=dict)
 
 
 def compare_multi_stage_scenarios(
@@ -58,6 +59,7 @@ def compare_multi_stage_scenarios(
             scenario.minutes,
             scenario.arrival_rate,
             scenario.improvement_costs,
+            scenario.improvement_values,
         )
         ranked_improvement_options = rank_improvement_options(
             improvement_options
@@ -89,9 +91,11 @@ def compare_multi_stage_scenarios(
             "recommendation": recommendation,
             "improvement_options": ranked_improvement_options,
             "best_improvement": best_improvement,
+            "matching_scenario": None,
         }
         rows.append(row)
 
+    _attach_matching_scenarios(rows)
     return rows
 
 
@@ -105,3 +109,36 @@ def _safe_divide(numerator, denominator):
     if denominator == 0:
         return 0
     return numerator / denominator
+
+
+def _attach_matching_scenarios(rows):
+    for row in rows:
+        best_improvement = row.get("best_improvement")
+        if not best_improvement:
+            continue
+
+        row["matching_scenario"] = _find_matching_scenario(row, rows)
+
+
+def _find_matching_scenario(row, rows):
+    target_completed = row["completed"] + row["best_improvement"]["completed_gain"]
+    target_wip = row["best_improvement"]["after_wip"]
+
+    candidates = [
+        candidate
+        for candidate in rows
+        if candidate["scenario"] != row["scenario"]
+        and candidate["completed"] >= target_completed
+        and candidate["total_wip"] <= target_wip
+    ]
+    if not candidates:
+        return None
+
+    return max(
+        candidates,
+        key=lambda candidate: (
+            candidate["completion_rate"],
+            candidate["completed"],
+            -candidate["total_wip"],
+        ),
+    )["scenario"]

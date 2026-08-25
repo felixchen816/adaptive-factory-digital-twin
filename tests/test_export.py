@@ -2,7 +2,11 @@ import csv
 import json
 from pathlib import Path
 
-from factory_twin.export import write_metrics_to_json, write_rows_to_csv
+from factory_twin.export import (
+    write_metrics_to_json,
+    write_rows_to_csv,
+    write_time_series_to_csv,
+)
 
 
 def test_write_rows_to_csv_creates_file(tmp_path):
@@ -81,3 +85,25 @@ def test_write_metrics_to_json(tmp_path: Path):
     assert data["completed"] == 19
     assert data["queue_bottleneck"] == "press"
     assert data["final_queue_lengths"]["press"] == 41
+
+
+def test_write_time_series_to_csv_combines_queue_and_completed_history(tmp_path):
+    queue_history = [
+        {"minute": 0, "cutter": 0, "press": 1},
+        {"minute": 1, "cutter": 0, "press": 2},
+    ]
+    completed_history = [
+        {"minute": 0, "completed": 0},
+        {"minute": 1, "completed": 1},
+    ]
+    output_path = tmp_path / "history.csv"
+
+    write_time_series_to_csv(queue_history, completed_history, output_path)
+
+    with open(output_path, newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        rows = list(reader)
+
+    assert reader.fieldnames == ["minute", "cutter", "press", "completed"]
+    assert rows[1]["press"] == "2"
+    assert rows[1]["completed"] == "1"

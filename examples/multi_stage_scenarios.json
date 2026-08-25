@@ -12,6 +12,9 @@
       "reduce_process_time": 2,
       "add_parallel_capacity": 4,
       "reduce_arrivals": 1
+    },
+    "improvement_values": {
+      "completed_part": 5
     }
   },
   {
@@ -32,6 +35,9 @@
       "reduce_process_time": 3,
       "add_parallel_capacity": 5,
       "reduce_arrivals": 1
+    },
+    "improvement_values": {
+      "completed_part": 5
     }
   },
   {
@@ -47,6 +53,9 @@
       "reduce_process_time": 2,
       "add_parallel_capacity": 3,
       "reduce_arrivals": 1
+    },
+    "improvement_values": {
+      "completed_part": 5
     }
   },
   {
@@ -62,6 +71,9 @@
       "reduce_process_time": 2,
       "add_parallel_capacity": 4,
       "reduce_arrivals": 1
+    },
+    "improvement_values": {
+      "completed_part": 5
     }
   }
 ]
