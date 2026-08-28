@@ -81,6 +81,8 @@ def compare_multi_stage_scenarios(
             "line_capacity_per_hour": metrics["line_capacity_per_hour"],
             "final_queue_lengths": final_queues,
             "max_queue_lengths": max_queues,
+            "queue_history": metrics["queue_history"],
+            "completed_history": metrics["completed_history"],
             "queue_bottleneck": queue_bottleneck,
             "total_wip": total_wip,
             "largest_final_queue": largest_final_queue,

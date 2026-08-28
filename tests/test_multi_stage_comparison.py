@@ -104,6 +104,8 @@ def test_result_keys(sample_scenarios):
         "improvement_options",
         "best_improvement",
         "matching_scenario",
+        "queue_history",
+        "completed_history",
     }
     for row in results:
         assert expected_keys.issubset(row.keys())
@@ -172,3 +174,10 @@ def test_comparison_matches_recommendation_to_existing_scenario(sample_scenarios
     baseline = {row["scenario"]: row for row in results}["baseline"]
 
     assert baseline["matching_scenario"] == "faster press"
+
+
+def test_comparison_rows_include_time_series_history(sample_scenarios):
+    row = compare_multi_stage_scenarios([sample_scenarios[0]])[0]
+
+    assert len(row["queue_history"]) == 60
+    assert row["completed_history"][-1]["completed"] == row["completed"]

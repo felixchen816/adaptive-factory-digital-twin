@@ -5,7 +5,8 @@ throughput, finding bottlenecks, and comparing improvement scenarios.
 
 The project started as a one-machine queue simulator and now includes a
 multi-stage production line with internal queues, bottleneck diagnosis,
-scenario comparison, improvement planning, JSON export, and Markdown reporting.
+scenario comparison, improvement planning, time-series exports, text charts,
+JSON export, and Markdown reporting.
 
 ## One-Machine Simulator
 
@@ -112,6 +113,13 @@ that turns simulation output into a ranked next action.
 
 The multi-stage report also includes a ranked improvement-options table so the
 best action can be compared against the other available options.
+
+## Text Charts
+
+The report includes compact ASCII queue-trend charts for each scenario's queue
+bottleneck. These use `queue_history` data and make it easier to see whether a
+queue is steadily growing, clearing, or staying flat without opening a separate
+plotting tool.
 
 ## Scenario Comparison
 
@@ -257,6 +265,7 @@ src/factory_twin/
   comparison.py               one-machine comparison helper
   decision.py                 one-machine best-scenario selector
   report.py                   one-machine Markdown report
+  chart.py                    text chart helpers
   line.py                     multi-stage production line model
   multi_stage.py              multi-stage queue simulator
   line_analysis.py            queue bottleneck analysis
@@ -272,8 +281,8 @@ src/factory_twin/
 
 Next steps:
 
-- add charts for throughput, WIP, and queue growth
-- compare recommended improvements against actual scenario configs
+- add graphical charts for throughput, WIP, and queue growth
+- compare recommended improvements against richer cost assumptions
 
 ## Why This Project Matters
 

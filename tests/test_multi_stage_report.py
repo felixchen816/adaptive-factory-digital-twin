@@ -24,6 +24,10 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
                 "net_value": 43,
             },
             "matching_scenario": "faster press",
+            "queue_history": [
+                {"minute": 0, "press": 0},
+                {"minute": 1, "press": 5},
+            ],
             "improvement_options": [
                 {
                     "rank": 1,
@@ -72,6 +76,7 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
                 "net_value": 26,
             },
             "matching_scenario": None,
+            "queue_history": [],
             "improvement_options": [],
         },
     ]
@@ -92,6 +97,8 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
     assert "## Ranked Improvement Options" in report
     assert "Matching Scenario" in report
     assert "| baseline | 1 | reduce process time | press | 2 | 9 | 9 | 4.50 | 45 | 43 |" in report
+    assert "## Queue Trend Charts" in report
+    assert "baseline - press" in report
 
 
 def test_build_multi_stage_report_formats_markdown_table():
@@ -117,6 +124,10 @@ def test_build_multi_stage_report_formats_markdown_table():
                 "net_value": 43,
             },
             "matching_scenario": "faster press",
+            "queue_history": [
+                {"minute": 0, "press": 0},
+                {"minute": 1, "press": 5},
+            ],
             "improvement_options": [
                 {
                     "rank": 1,

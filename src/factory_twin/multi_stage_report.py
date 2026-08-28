@@ -1,3 +1,6 @@
+from factory_twin.chart import build_queue_trend_chart
+
+
 def build_multi_stage_report(rows, best):
     """Build a Markdown report for multi-stage scenario comparisons."""
     lines = [
@@ -55,6 +58,28 @@ def build_multi_stage_report(rows, best):
                 f"{_format_number(option.get('estimated_value', 0))} | "
                 f"{_format_number(option.get('net_value', 0))} |"
             )
+
+    lines.extend(
+        [
+            "",
+            "## Queue Trend Charts",
+            "",
+        ]
+    )
+    for row in rows:
+        lines.extend(
+            [
+                f"### {row['scenario']} - {row['queue_bottleneck']}",
+                "",
+                "```text",
+                build_queue_trend_chart(
+                    row.get("queue_history", []),
+                    row["queue_bottleneck"],
+                ),
+                "```",
+                "",
+            ]
+        )
 
     lines.append("")
     return "\n".join(lines)
