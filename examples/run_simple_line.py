@@ -7,6 +7,7 @@ SRC_DIR = REPO_ROOT / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
+from factory_twin.chart import write_queue_trend_svg
 from factory_twin.comparison import compare_scenarios
 from factory_twin.config import load_multi_stage_scenarios
 from factory_twin.decision import choose_best_scenario
@@ -100,6 +101,12 @@ def parse_args(argv=None):
         default=REPO_ROOT / "multi_stage_history.csv",
         type=Path,
         help="Output path for multi-stage queue and throughput history.",
+    )
+    parser.add_argument(
+        "--multi-stage-chart-svg",
+        default=REPO_ROOT / "multi_stage_queue_chart.svg",
+        type=Path,
+        help="Output path for the multi-stage queue bottleneck SVG chart.",
     )
     parser.add_argument(
         "--simple-csv",
@@ -196,6 +203,12 @@ def main(argv=None):
         args.multi_stage_history_csv,
     )
     print(f"Wrote history to {args.multi_stage_history_csv.name}")
+    write_queue_trend_svg(
+        multi_stage_metrics["queue_history"],
+        queue_bottleneck,
+        args.multi_stage_chart_svg,
+    )
+    print(f"Wrote chart to {args.multi_stage_chart_svg.name}")
 
     for row in rows:
         print(f"\nScenario: {row['scenario']}")

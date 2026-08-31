@@ -25,6 +25,7 @@ def test_example_accepts_config_and_output_paths(tmp_path):
     multi_stage_json = tmp_path / "multi_stage_results.json"
     multi_stage_report = tmp_path / "multi_stage_report.md"
     multi_stage_history_csv = tmp_path / "multi_stage_history.csv"
+    multi_stage_chart_svg = tmp_path / "multi_stage_queue_chart.svg"
     simple_csv = tmp_path / "simple_line_results.csv"
     simple_report = tmp_path / "simple_line_report.md"
 
@@ -38,6 +39,8 @@ def test_example_accepts_config_and_output_paths(tmp_path):
             str(multi_stage_report),
             "--multi-stage-history-csv",
             str(multi_stage_history_csv),
+            "--multi-stage-chart-svg",
+            str(multi_stage_chart_svg),
             "--simple-csv",
             str(simple_csv),
             "--simple-report",
@@ -48,6 +51,7 @@ def test_example_accepts_config_and_output_paths(tmp_path):
     assert multi_stage_json.exists()
     assert multi_stage_report.exists()
     assert multi_stage_history_csv.exists()
+    assert multi_stage_chart_svg.exists()
     assert simple_csv.exists()
     assert simple_report.exists()
     assert "custom baseline" in multi_stage_report.read_text(encoding="utf-8")
@@ -63,3 +67,4 @@ def test_example_accepts_config_and_output_paths(tmp_path):
         "inspector": 0,
     }
     assert "completed" in multi_stage_history_csv.read_text(encoding="utf-8")
+    assert "<svg" in multi_stage_chart_svg.read_text(encoding="utf-8")

@@ -6,7 +6,7 @@ throughput, finding bottlenecks, and comparing improvement scenarios.
 The project started as a one-machine queue simulator and now includes a
 multi-stage production line with internal queues, bottleneck diagnosis,
 scenario comparison, improvement planning, time-series exports, text charts,
-JSON export, and Markdown reporting.
+SVG charts, JSON export, and Markdown reporting.
 
 ## One-Machine Simulator
 
@@ -121,6 +121,9 @@ bottleneck. These use `queue_history` data and make it easier to see whether a
 queue is steadily growing, clearing, or staying flat without opening a separate
 plotting tool.
 
+The demo also exports `multi_stage_queue_chart.svg`, a simple SVG line chart
+for the default three-stage line's queue bottleneck.
+
 ## Scenario Comparison
 
 The demo compares multiple multi-stage scenarios:
@@ -164,6 +167,7 @@ The demo generates these local output files:
 - `multi_stage_results.json`
 - `multi_stage_report.md`
 - `multi_stage_history.csv`
+- `multi_stage_queue_chart.svg`
 
 These files are ignored by git because they are generated artifacts.
 
@@ -187,7 +191,8 @@ To use a different multi-stage scenario file or output location:
   --multi-stage-config examples/multi_stage_scenarios.json \
   --multi-stage-json multi_stage_results.json \
   --multi-stage-report multi_stage_report.md \
-  --multi-stage-history-csv multi_stage_history.csv
+  --multi-stage-history-csv multi_stage_history.csv \
+  --multi-stage-chart-svg multi_stage_queue_chart.svg
 ```
 
 ## Scenario Config Format
@@ -281,8 +286,8 @@ src/factory_twin/
 
 Next steps:
 
-- add graphical charts for throughput, WIP, and queue growth
 - compare recommended improvements against richer cost assumptions
+- add multiple SVG charts for throughput, WIP, and per-stage queues
 
 ## Why This Project Matters
 
