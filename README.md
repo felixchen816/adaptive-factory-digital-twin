@@ -6,7 +6,7 @@ throughput, finding bottlenecks, and comparing improvement scenarios.
 The project started as a one-machine queue simulator and now includes a
 multi-stage production line with internal queues, bottleneck diagnosis,
 scenario comparison, improvement planning, time-series exports, text charts,
-SVG charts, JSON export, and Markdown reporting.
+SVG charts, a static dashboard UI, JSON export, and Markdown reporting.
 
 ## One-Machine Simulator
 
@@ -124,6 +124,17 @@ plotting tool.
 The demo also exports `multi_stage_queue_chart.svg`, a simple SVG line chart
 for the default three-stage line's queue bottleneck.
 
+## Dashboard UI
+
+The demo generates `factory_dashboard.html`, a self-contained static dashboard
+for the multi-stage scenarios. It shows:
+
+- high-level summary metrics
+- scenario comparison table
+- recommended improvement table
+- matching scenario results
+- embedded SVG queue trend charts
+
 ## Scenario Comparison
 
 The demo compares multiple multi-stage scenarios:
@@ -168,6 +179,7 @@ The demo generates these local output files:
 - `multi_stage_report.md`
 - `multi_stage_history.csv`
 - `multi_stage_queue_chart.svg`
+- `factory_dashboard.html`
 
 These files are ignored by git because they are generated artifacts.
 
@@ -192,7 +204,8 @@ To use a different multi-stage scenario file or output location:
   --multi-stage-json multi_stage_results.json \
   --multi-stage-report multi_stage_report.md \
   --multi-stage-history-csv multi_stage_history.csv \
-  --multi-stage-chart-svg multi_stage_queue_chart.svg
+  --multi-stage-chart-svg multi_stage_queue_chart.svg \
+  --dashboard-html factory_dashboard.html
 ```
 
 ## Scenario Config Format
@@ -271,6 +284,7 @@ src/factory_twin/
   decision.py                 one-machine best-scenario selector
   report.py                   one-machine Markdown report
   chart.py                    text chart helpers
+  dashboard.py                static HTML dashboard generator
   line.py                     multi-stage production line model
   multi_stage.py              multi-stage queue simulator
   line_analysis.py            queue bottleneck analysis
@@ -287,7 +301,7 @@ src/factory_twin/
 Next steps:
 
 - compare recommended improvements against richer cost assumptions
-- add multiple SVG charts for throughput, WIP, and per-stage queues
+- add multiple dashboard charts for throughput, WIP, and per-stage queues
 
 ## Why This Project Matters
 

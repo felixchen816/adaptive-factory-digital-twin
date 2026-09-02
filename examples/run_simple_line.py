@@ -10,6 +10,7 @@ if str(SRC_DIR) not in sys.path:
 from factory_twin.chart import write_queue_trend_svg
 from factory_twin.comparison import compare_scenarios
 from factory_twin.config import load_multi_stage_scenarios
+from factory_twin.dashboard import write_dashboard_html
 from factory_twin.decision import choose_best_scenario
 from factory_twin.export import (
     write_metrics_to_json,
@@ -109,6 +110,12 @@ def parse_args(argv=None):
         help="Output path for the multi-stage queue bottleneck SVG chart.",
     )
     parser.add_argument(
+        "--dashboard-html",
+        default=REPO_ROOT / "factory_dashboard.html",
+        type=Path,
+        help="Output path for the static HTML dashboard.",
+    )
+    parser.add_argument(
         "--simple-csv",
         default=REPO_ROOT / "simple_line_results.csv",
         type=Path,
@@ -173,6 +180,8 @@ def main(argv=None):
     with open(args.multi_stage_report, "w", encoding="utf-8") as report_file:
         report_file.write(multi_stage_report)
     print(f"Wrote report to {args.multi_stage_report.name}")
+    write_dashboard_html(ms_rows, best_multi_stage, args.dashboard_html)
+    print(f"Wrote dashboard to {args.dashboard_html.name}")
 
     # Build multi-stage export dictionary matching expected schema
     multi_stage_results = {
