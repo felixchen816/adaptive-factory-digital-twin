@@ -59,6 +59,10 @@ def test_build_dashboard_html_contains_summary_and_chart():
     assert "Improve press by reducing process time." in html
     assert "<svg" in html
     assert "Executive Summary" in html
+    assert "Model Assumptions" in html
+    assert "Arrivals use a fixed average rate" in html
+    assert "Limitations" in html
+    assert "deterministic" in html
     assert "Total WIP" in html
     assert "Completed parts trend" in html
     assert "Per-Stage Queue Charts" in html

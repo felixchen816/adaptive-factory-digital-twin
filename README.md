@@ -131,6 +131,7 @@ for the multi-stage scenarios. It shows:
 
 - high-level summary metrics
 - executive summary
+- model assumptions and limitations
 - scenario comparison table
 - recommended improvement table
 - matching scenario results
@@ -185,6 +186,10 @@ The demo generates these local output files:
 - `factory_dashboard.html`
 
 These files are ignored by git because they are generated artifacts.
+
+The multi-stage report includes a short case study that compares the baseline
+line against the selected best scenario. It explains the completed-part change,
+WIP change, bottleneck behavior, and decision logic used to choose the result.
 
 ## Run the Demo
 

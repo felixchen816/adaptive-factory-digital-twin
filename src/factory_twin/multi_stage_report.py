@@ -10,6 +10,10 @@ def build_multi_stage_report(rows, best):
         "",
         f"Best scenario: {best['scenario']}",
         "",
+        "## Case Study",
+        "",
+        _case_study(rows, best),
+        "",
         "## Scenario Results",
         "",
         "| Scenario | Completed | Arrivals | Completion Rate | Throughput/hr | Total WIP | Largest Final Queue | Largest Max Queue | WIP/Completed | Bottleneck Machine | Queue Bottleneck | Recommendation | Best Improvement | Completed Gain | Benefit/Cost | Matching Scenario |",
@@ -89,6 +93,44 @@ def _format_number(value):
     if isinstance(value, float):
         return f"{value:.2f}"
     return value
+
+
+def _case_study(rows, best):
+    baseline = _baseline_row(rows) or rows[0]
+    completed_gain = best["completed"] - baseline["completed"]
+    wip_change = best["total_wip"] - baseline["total_wip"]
+    bottleneck_change = _bottleneck_change(baseline, best)
+    improvement = best.get("best_improvement") or {}
+    improvement_summary = improvement.get("summary", "No additional improvement is needed.")
+
+    return (
+        f"Baseline completed {baseline['completed']} of {baseline['arrivals']} arrivals "
+        f"with {_format_number(baseline['total_wip'])} total WIP and "
+        f"{baseline['queue_bottleneck']} as the queue bottleneck. "
+        f"The selected scenario, {best['scenario']}, completed {best['completed']} "
+        f"of {best['arrivals']} arrivals with {_format_number(best['total_wip'])} "
+        f"total WIP. That is a completed-part change of {completed_gain} and "
+        f"a WIP change of {wip_change}. {bottleneck_change} "
+        f"Decision logic prioritized completion rate first, then completed parts, "
+        f"then lower WIP and lower peak queue. Recommended next action: "
+        f"{improvement_summary}"
+    )
+
+
+def _baseline_row(rows):
+    for row in rows:
+        if row["scenario"].lower() == "baseline":
+            return row
+    return None
+
+
+def _bottleneck_change(baseline, best):
+    if baseline["queue_bottleneck"] == best["queue_bottleneck"]:
+        return f"The queue bottleneck remained {best['queue_bottleneck']}."
+    return (
+        f"The queue bottleneck moved from {baseline['queue_bottleneck']} "
+        f"to {best['queue_bottleneck']}."
+    )
 
 
 def _improvement_summary(row):

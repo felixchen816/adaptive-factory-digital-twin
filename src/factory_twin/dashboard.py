@@ -47,6 +47,16 @@ def build_dashboard_html(rows, best):
             "<h2>Executive Summary</h2>",
             _executive_summary(scenario_rows, best),
             "</section>",
+            '<section class="two-column">',
+            '<section class="panel">',
+            "<h2>Model Assumptions</h2>",
+            _assumptions_list(),
+            "</section>",
+            '<section class="panel">',
+            "<h2>Limitations</h2>",
+            _limitations_list(),
+            "</section>",
+            "</section>",
             '<section class="panel">',
             "<h2>Scenario Comparison</h2>",
             _comparison_table(scenario_rows),
@@ -171,6 +181,29 @@ def _executive_summary(rows, best):
     )
 
 
+def _assumptions_list():
+    assumptions = [
+        "Arrivals use a fixed average rate during the simulation window.",
+        "Each machine processes one part at a time unless parallel units are configured.",
+        "Queues are tracked in front of each stage and parts move in route order.",
+        "Downtime minutes represent planned unavailable time for a machine.",
+    ]
+    return _bullet_list(assumptions)
+
+
+def _limitations_list():
+    limitations = [
+        "The model is deterministic, so it does not yet sample random arrivals or failures.",
+        "Improvement costs are simple scores, not full capital or labor budgets.",
+        "Recommendations identify operational levers but do not schedule implementation work.",
+    ]
+    return _bullet_list(limitations)
+
+
+def _bullet_list(items):
+    return "<ul>" + "".join(f"<li>{escape(item)}</li>" for item in items) + "</ul>"
+
+
 def _dashboard_chart(title, svg):
     return (
         '<section class="chart-panel">'
@@ -291,6 +324,21 @@ h2 {
   padding: 18px;
   overflow-x: auto;
 }
+.two-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.two-column .panel {
+  margin-top: 0;
+}
+ul {
+  margin: 0;
+  padding-left: 20px;
+}
+li {
+  margin: 8px 0;
+}
 table {
   width: 100%;
   border-collapse: collapse;
@@ -340,7 +388,8 @@ th {
     flex-direction: column;
   }
   .metrics,
-  .chart-grid {
+  .chart-grid,
+  .two-column {
     grid-template-columns: 1fr;
   }
   h1 {

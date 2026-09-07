@@ -85,6 +85,10 @@ def test_build_multi_stage_report_contains_recommendation_and_results():
 
     assert "# Multi-Stage Production Line Report" in report
     assert "Best scenario: faster press" in report
+    assert "## Case Study" in report
+    assert "Baseline completed 19 of 60 arrivals" in report
+    assert "completed-part change of 9" in report
+    assert "Decision logic prioritized completion rate first" in report
     assert "baseline" in report
     assert "faster press" in report
     assert "Completion Rate" in report
