@@ -43,6 +43,7 @@ The project is portfolio-ready when a reviewer can open the repository, run one 
 - Run the full test suite.
 - Run the demo.
 - Open or inspect the dashboard output.
+- Run `.venv/bin/python scripts/verify_project.py` as the single final check.
 - Commit final polish and push.
 
 ## Do Not Add Unless There Is Extra Time

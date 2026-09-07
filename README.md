@@ -15,10 +15,13 @@ From the repository root:
 ```bash
 .venv/bin/python -m pytest
 .venv/bin/python examples/run_simple_line.py
+.venv/bin/python scripts/verify_project.py
 ```
 
 The first command verifies the project. The second command runs the demo and
-generates the local CSV, JSON, Markdown, SVG, and HTML outputs.
+generates the local CSV, JSON, Markdown, SVG, and HTML outputs. The third
+command runs the full final verification: tests, compile checks, demo
+generation, and artifact inspections.
 
 ## One-Machine Simulator
 
@@ -293,6 +296,12 @@ Config validation rejects:
 The project uses `pyproject.toml` to add `src` to the pytest import path, so
 manual `PYTHONPATH=src` setup is no longer needed for tests.
 
+For final portfolio verification, run:
+
+```bash
+.venv/bin/python scripts/verify_project.py
+```
+
 ## Project Structure
 
 ```text
@@ -314,6 +323,8 @@ src/factory_twin/
   multi_stage_report.py       multi-stage Markdown report
   config.py                   JSON scenario loading
   export.py                   CSV and JSON export helpers
+scripts/
+  verify_project.py           final portfolio verification command
 ```
 
 ## Roadmap
