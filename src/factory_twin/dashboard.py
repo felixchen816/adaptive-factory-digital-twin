@@ -3,7 +3,11 @@
 from html import escape
 from pathlib import Path
 
-from factory_twin.chart import build_queue_trend_svg
+from factory_twin.chart import (
+    build_completed_trend_svg,
+    build_stage_queue_svgs,
+    build_total_wip_svg,
+)
 
 
 def build_dashboard_html(rows, best):
@@ -40,6 +44,10 @@ def build_dashboard_html(rows, best):
             _metric("Best Completion Rate", _format_percent(best.get("completion_rate", 0) if best else 0)),
             "</section>",
             '<section class="panel">',
+            "<h2>Executive Summary</h2>",
+            _executive_summary(scenario_rows, best),
+            "</section>",
+            '<section class="panel">',
             "<h2>Scenario Comparison</h2>",
             _comparison_table(scenario_rows),
             "</section>",
@@ -48,7 +56,25 @@ def build_dashboard_html(rows, best):
             _improvement_table(scenario_rows),
             "</section>",
             '<section class="chart-grid">',
+            _dashboard_chart(
+                "Best Scenario Total WIP",
+                build_total_wip_svg(best.get("queue_history", []) if best else [], 520, 260),
+            ),
+            _dashboard_chart(
+                "Best Scenario Throughput",
+                build_completed_trend_svg(
+                    best.get("completed_history", []) if best else [],
+                    520,
+                    260,
+                ),
+            ),
+            "</section>",
+            '<section class="chart-grid">',
             *_chart_panels(scenario_rows),
+            "</section>",
+            '<section class="panel">',
+            "<h2>Per-Stage Queue Charts</h2>",
+            _stage_queue_charts(best),
             "</section>",
             "</main>",
             "</body>",
@@ -113,7 +139,10 @@ def _chart_panels(rows):
     panels = []
     for row in rows:
         stage = row["queue_bottleneck"]
-        svg = build_queue_trend_svg(row.get("queue_history", []), stage, 520, 260)
+        svg = build_stage_queue_svgs(row.get("queue_history", [])).get(
+            stage,
+            "",
+        )
         panels.append(
             '<section class="chart-panel">'
             f"<h2>{escape(row['scenario'])}</h2>"
@@ -122,6 +151,50 @@ def _chart_panels(rows):
             "</section>"
         )
     return panels
+
+
+def _executive_summary(rows, best):
+    if not best:
+        return "<p>No scenario data available.</p>"
+
+    best_improvement = best.get("best_improvement") or {}
+    matching_count = sum(1 for row in rows if row.get("matching_scenario"))
+    return (
+        "<p>"
+        f"The best scenario is <strong>{escape(best['scenario'])}</strong>, "
+        f"with {_format_percent(best['completion_rate'])} completion, "
+        f"{_format_number(best['throughput_per_hour'])} parts/hour, and "
+        f"{_format_number(best['total_wip'])} total WIP. "
+        f"The top follow-up action is {escape(best_improvement.get('summary', 'No change needed.'))} "
+        f"{matching_count} scenario(s) already match a recommended improvement."
+        "</p>"
+    )
+
+
+def _dashboard_chart(title, svg):
+    return (
+        '<section class="chart-panel">'
+        f"<h2>{escape(title)}</h2>"
+        f"{svg}"
+        "</section>"
+    )
+
+
+def _stage_queue_charts(best):
+    if not best:
+        return "<p>No scenario data available.</p>"
+
+    charts = build_stage_queue_svgs(best.get("queue_history", []))
+    if not charts:
+        return "<p>No queue history available.</p>"
+
+    return "".join(
+        '<section class="stage-chart">'
+        f"<h3>{escape(stage)}</h3>"
+        f"{svg}"
+        "</section>"
+        for stage, svg in charts.items()
+    )
 
 
 def _metric(label, value):
@@ -247,6 +320,17 @@ th {
   color: #667085;
 }
 .chart-panel svg {
+  width: 100%;
+  height: auto;
+}
+.stage-chart {
+  margin-top: 16px;
+}
+.stage-chart h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+.stage-chart svg {
   width: 100%;
   height: auto;
 }

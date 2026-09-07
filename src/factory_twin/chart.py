@@ -53,23 +53,79 @@ def build_queue_trend_svg(queue_history, stage, width=640, height=320):
     if not queue_history:
         return _empty_svg("No queue history available.", width, height)
 
+    values = [row.get(stage, 0) for row in queue_history]
+    return _build_line_svg(queue_history, values, f"{stage} queue trend", width, height)
+
+
+def build_stage_queue_svgs(queue_history):
+    """Build one queue trend SVG for each stage in queue history."""
+    if not queue_history:
+        return {}
+
+    stages = [
+        key for key in queue_history[0].keys()
+        if key != "minute"
+    ]
+    return {
+        stage: build_queue_trend_svg(queue_history, stage)
+        for stage in stages
+    }
+
+
+def build_total_wip_svg(queue_history, width=640, height=320):
+    """Build an SVG line chart for total work in process over time."""
+    if not queue_history:
+        return _empty_svg("No queue history available.", width, height)
+
     values = [
-        row.get(stage, 0)
+        sum(value for key, value in row.items() if key != "minute")
         for row in queue_history
     ]
+    return _build_line_svg(queue_history, values, "Total WIP trend", width, height)
+
+
+def build_completed_trend_svg(completed_history, width=640, height=320):
+    """Build an SVG line chart for cumulative completed parts."""
+    if not completed_history:
+        return _empty_svg("No completed history available.", width, height)
+
+    values = [
+        row.get("completed", 0)
+        for row in completed_history
+    ]
+    return _build_line_svg(
+        completed_history,
+        values,
+        "Completed parts trend",
+        width,
+        height,
+    )
+
+
+def write_queue_trend_svg(queue_history, stage, output_path):
+    """Write an SVG queue trend chart to disk."""
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        build_queue_trend_svg(queue_history, stage),
+        encoding="utf-8",
+    )
+
+
+def _build_line_svg(history, values, title_text, width, height):
     max_value = max(values) or 1
-    max_minute = max(row["minute"] for row in queue_history) or 1
+    max_minute = max(row["minute"] for row in history) or 1
     margin = 40
     chart_width = width - margin * 2
     chart_height = height - margin * 2
 
     points = []
-    for row in queue_history:
+    for row, value in zip(history, values):
         x = margin + row["minute"] / max_minute * chart_width
-        y = height - margin - row.get(stage, 0) / max_value * chart_height
+        y = height - margin - value / max_value * chart_height
         points.append(f"{x:.1f},{y:.1f}")
 
-    title = escape(f"{stage} queue trend")
+    title = escape(title_text)
     return "\n".join(
         [
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
@@ -82,16 +138,6 @@ def build_queue_trend_svg(queue_history, stage, width=640, height=320):
             f'<text x="8" y="{margin}" font-family="Arial" font-size="12">queue</text>',
             "</svg>",
         ]
-    )
-
-
-def write_queue_trend_svg(queue_history, stage, output_path):
-    """Write an SVG queue trend chart to disk."""
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(
-        build_queue_trend_svg(queue_history, stage),
-        encoding="utf-8",
     )
 
 

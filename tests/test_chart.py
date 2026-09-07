@@ -1,4 +1,7 @@
 from factory_twin.chart import (
+    build_completed_trend_svg,
+    build_stage_queue_svgs,
+    build_total_wip_svg,
     build_queue_trend_chart,
     build_queue_trend_svg,
     write_queue_trend_svg,
@@ -50,3 +53,40 @@ def test_write_queue_trend_svg_creates_file(tmp_path):
 
     assert output_path.exists()
     assert "<svg" in output_path.read_text(encoding="utf-8")
+
+
+def test_build_stage_queue_svgs_returns_one_chart_per_stage():
+    queue_history = [
+        {"minute": 0, "cutter": 0, "press": 1},
+        {"minute": 1, "cutter": 0, "press": 2},
+    ]
+
+    charts = build_stage_queue_svgs(queue_history)
+
+    assert set(charts) == {"cutter", "press"}
+    assert "cutter queue trend" in charts["cutter"]
+    assert "press queue trend" in charts["press"]
+
+
+def test_build_total_wip_svg_sums_stage_queues():
+    queue_history = [
+        {"minute": 0, "cutter": 1, "press": 2},
+        {"minute": 1, "cutter": 2, "press": 4},
+    ]
+
+    svg = build_total_wip_svg(queue_history)
+
+    assert "Total WIP trend" in svg
+    assert "<polyline" in svg
+
+
+def test_build_completed_trend_svg_uses_completed_history():
+    completed_history = [
+        {"minute": 0, "completed": 0},
+        {"minute": 1, "completed": 2},
+    ]
+
+    svg = build_completed_trend_svg(completed_history)
+
+    assert "Completed parts trend" in svg
+    assert "<polyline" in svg

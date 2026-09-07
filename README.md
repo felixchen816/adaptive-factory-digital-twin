@@ -130,10 +130,13 @@ The demo generates `factory_dashboard.html`, a self-contained static dashboard
 for the multi-stage scenarios. It shows:
 
 - high-level summary metrics
+- executive summary
 - scenario comparison table
 - recommended improvement table
 - matching scenario results
 - embedded SVG queue trend charts
+- total WIP and completed-parts charts for the best scenario
+- per-stage queue charts for the best scenario
 
 ## Scenario Comparison
 
@@ -301,7 +304,7 @@ src/factory_twin/
 Next steps:
 
 - compare recommended improvements against richer cost assumptions
-- add multiple dashboard charts for throughput, WIP, and per-stage queues
+- finish the Sep 15 portfolio polish plan in `docs/sep15_finish_plan.md`
 
 ## Why This Project Matters
 

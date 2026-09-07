@@ -19,8 +19,12 @@ def sample_rows():
             },
             "matching_scenario": "faster press",
             "queue_history": [
-                {"minute": 0, "press": 0},
-                {"minute": 1, "press": 5},
+                {"minute": 0, "cutter": 0, "press": 0},
+                {"minute": 1, "cutter": 0, "press": 5},
+            ],
+            "completed_history": [
+                {"minute": 0, "completed": 0},
+                {"minute": 1, "completed": 1},
             ],
         },
         {
@@ -33,7 +37,14 @@ def sample_rows():
             "queue_bottleneck": "press",
             "best_improvement": None,
             "matching_scenario": None,
-            "queue_history": [],
+            "queue_history": [
+                {"minute": 0, "cutter": 0, "press": 0},
+                {"minute": 1, "cutter": 0, "press": 2},
+            ],
+            "completed_history": [
+                {"minute": 0, "completed": 0},
+                {"minute": 1, "completed": 2},
+            ],
         },
     ]
 
@@ -47,6 +58,10 @@ def test_build_dashboard_html_contains_summary_and_chart():
     assert "faster press" in html
     assert "Improve press by reducing process time." in html
     assert "<svg" in html
+    assert "Executive Summary" in html
+    assert "Total WIP" in html
+    assert "Completed parts trend" in html
+    assert "Per-Stage Queue Charts" in html
 
 
 def test_write_dashboard_html_creates_file(tmp_path):
