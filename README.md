@@ -23,6 +23,17 @@ generates the local CSV, JSON, Markdown, SVG, and HTML outputs. The third
 command runs the full final verification: tests, compile checks, demo
 generation, and artifact inspections.
 
+## Reviewer Checklist
+
+After running the demo, the console output, report, dashboard, and exports show:
+
+- what the simulator models
+- best multi-stage scenario
+- machine and queue bottlenecks
+- recommended improvement action
+- improvement comparison against other scenarios
+- charts and generated artifacts
+
 ## One-Machine Simulator
 
 The one-machine model represents a simple production line with one demand
