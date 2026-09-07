@@ -8,6 +8,18 @@ multi-stage production line with internal queues, bottleneck diagnosis,
 scenario comparison, improvement planning, time-series exports, text charts,
 SVG charts, a static dashboard UI, JSON export, and Markdown reporting.
 
+## What To Run
+
+From the repository root:
+
+```bash
+.venv/bin/python -m pytest
+.venv/bin/python examples/run_simple_line.py
+```
+
+The first command verifies the project. The second command runs the demo and
+generates the local CSV, JSON, Markdown, SVG, and HTML outputs.
+
 ## One-Machine Simulator
 
 The one-machine model represents a simple production line with one demand
@@ -191,7 +203,7 @@ The multi-stage report includes a short case study that compares the baseline
 line against the selected best scenario. It explains the completed-part change,
 WIP change, bottleneck behavior, and decision logic used to choose the result.
 
-## Run the Demo
+## Demo Options
 
 From the repository root:
 
