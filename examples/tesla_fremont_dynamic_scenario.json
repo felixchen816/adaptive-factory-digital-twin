@@ -1,0 +1,57 @@
+[
+  {
+    "name": "tesla fremont dynamic surge and failure case",
+    "minutes": 1440,
+    "arrival_rate": 1.0464231354642313,
+    "arrival_schedule": [
+      {"start": 240, "end": 420, "value": 1.45},
+      {"start": 720, "end": 840, "value": 0.72},
+      {"start": 960, "end": 1140, "value": 1.30}
+    ],
+    "machines": [
+      {
+        "name": "blanking and stamping",
+        "process_time": 5,
+        "parallel_units": 10
+      },
+      {
+        "name": "rear underbody casting",
+        "process_time": 10,
+        "parallel_units": 11,
+        "downtime_minutes": [500, 501, 502, 503, 504, 505, 506, 507, 508, 509]
+      },
+      {
+        "name": "body shop welding",
+        "process_time": 10,
+        "parallel_units": 11
+      },
+      {
+        "name": "paint shop",
+        "process_time": 10,
+        "parallel_units": 11,
+        "process_time_schedule": [
+          {"start": 600, "end": 780, "value": 14}
+        ]
+      },
+      {
+        "name": "battery and drive-unit marriage",
+        "process_time": 10,
+        "parallel_units": 11
+      },
+      {
+        "name": "final assembly and end-of-line test",
+        "process_time": 10,
+        "parallel_units": 11,
+        "downtime_minutes": [1020, 1021, 1022, 1023, 1024]
+      }
+    ],
+    "improvement_costs": {
+      "reduce_process_time": 8,
+      "add_parallel_capacity": 15,
+      "reduce_arrivals": 1
+    },
+    "improvement_values": {
+      "completed_part": 45000
+    }
+  }
+]

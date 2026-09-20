@@ -1,4 +1,4 @@
-def simulate_production_line(line, minutes, arrival_rate):
+def simulate_production_line(line, minutes, arrival_rate, arrival_schedule=()):
     """
     Simulate a production line with one queue in front of each machine.
 
@@ -16,14 +16,20 @@ def simulate_production_line(line, minutes, arrival_rate):
     downtime_events = {machine.name: 0 for machine in machines}
     queue_history = []
     completed_history = []
+    arrival_history = []
     completed = 0
+    arrivals = 0
 
     for minute in range(minutes):
-        queues[0] += arrival_rate
+        minute_arrivals = _scheduled_value(arrival_rate, arrival_schedule, minute)
+        if minute_arrivals < 0:
+            raise ValueError("arrival rates must be non-negative")
+        arrivals += minute_arrivals
+        queues[0] += minute_arrivals
 
         for stage_index in reversed(range(len(machines))):
             machine = machines[stage_index]
-            process_time = _get_process_time(machine)
+            process_time = _get_process_time(machine, minute)
             parallel_units = _get_parallel_units(machine)
             if _is_down(machine, minute):
                 downtime_events[machine.name] += 1
@@ -50,6 +56,13 @@ def simulate_production_line(line, minutes, arrival_rate):
                 "completed": completed,
             }
         )
+        arrival_history.append(
+            {
+                "minute": minute,
+                "arrivals": minute_arrivals,
+                "cumulative_arrivals": arrivals,
+            }
+        )
 
     final_queue_lengths = _stage_dict(machines, queues)
     max_queue_lengths_by_stage = _stage_dict(machines, max_queue_lengths)
@@ -58,8 +71,8 @@ def simulate_production_line(line, minutes, arrival_rate):
         "line": line.line_name,
         "completed": completed,
         "throughput_per_hour": completed * 60 / minutes if minutes else 0,
-        "arrivals": arrival_rate * minutes,
-        "demand_per_hour": arrival_rate * 60,
+        "arrivals": arrivals,
+        "demand_per_hour": arrivals * 60 / minutes if minutes else 0,
         "bottleneck_machine": line.bottleneck_machine.name,
         "bottleneck_process_time": line.bottleneck_process_time,
         "line_capacity_per_hour": line.capacity_per_hour,
@@ -69,16 +82,29 @@ def simulate_production_line(line, minutes, arrival_rate):
         "downtime_events": downtime_events,
         "queue_history": queue_history,
         "completed_history": completed_history,
+        "arrival_history": arrival_history,
     }
 
 
-def _get_process_time(machine):
+def _get_process_time(machine, minute=0):
     process_time = getattr(machine, "process_time", None)
     if process_time is None:
         raise ValueError("each machine must define a process_time")
+    process_time = _scheduled_value(
+        process_time,
+        getattr(machine, "process_time_schedule", ()),
+        minute,
+    )
     if process_time <= 0:
         raise ValueError("process_time must be positive")
     return process_time
+
+
+def _scheduled_value(default_value, schedule, minute):
+    for window in schedule or ():
+        if window["start"] <= minute < window["end"]:
+            return window["value"]
+    return default_value
 
 
 def _get_parallel_units(machine):

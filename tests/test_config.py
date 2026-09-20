@@ -93,6 +93,60 @@ def test_load_multi_stage_scenarios_loads_downtime_minutes(tmp_path):
     assert scenario.line.machines[0].downtime_minutes == (6, 9)
 
 
+def test_load_multi_stage_scenarios_loads_arrival_schedule(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "surge demand",
+                    "arrival_rate": 1,
+                    "arrival_schedule": [
+                        {"start": 10, "end": 20, "value": 2.5},
+                    ],
+                    "machines": [{"name": "press", "process_time": 3}],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    scenario = load_multi_stage_scenarios(config_path)[0]
+
+    assert scenario.arrival_schedule == (
+        {"start": 10, "end": 20, "value": 2.5},
+    )
+
+
+def test_load_multi_stage_scenarios_loads_process_time_schedule(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "paint slowdown",
+                    "machines": [
+                        {
+                            "name": "paint",
+                            "process_time": 10,
+                            "process_time_schedule": [
+                                {"start": 60, "end": 120, "value": 14},
+                            ],
+                        }
+                    ],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    scenario = load_multi_stage_scenarios(config_path)[0]
+
+    assert scenario.line.machines[0].process_time_schedule == (
+        {"start": 60, "end": 120, "value": 14},
+    )
+
+
 def test_load_multi_stage_scenarios_loads_improvement_costs(tmp_path):
     config_path = tmp_path / "scenarios.json"
     config_path.write_text(
@@ -355,6 +409,51 @@ def test_load_multi_stage_scenarios_rejects_negative_downtime_minutes(tmp_path):
     )
 
     with pytest.raises(ValueError, match="machine downtime_minutes must be non-negative integers"):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_bad_arrival_schedule(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "bad surge",
+                    "arrival_schedule": [{"start": 10, "end": 5, "value": 2}],
+                    "machines": [{"name": "press", "process_time": 3}],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="scenario arrival_schedule end must be after start"):
+        load_multi_stage_scenarios(config_path)
+
+
+def test_load_multi_stage_scenarios_rejects_bad_process_time_schedule(tmp_path):
+    config_path = tmp_path / "scenarios.json"
+    config_path.write_text(
+        json.dumps(
+            [
+                {
+                    "name": "bad slowdown",
+                    "machines": [
+                        {
+                            "name": "paint",
+                            "process_time": 10,
+                            "process_time_schedule": [
+                                {"start": 1, "end": 5, "value": 0},
+                            ],
+                        }
+                    ],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="machine process_time_schedule value must be positive"):
         load_multi_stage_scenarios(config_path)
 
 

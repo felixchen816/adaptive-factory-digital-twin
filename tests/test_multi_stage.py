@@ -95,6 +95,57 @@ def test_machine_downtime_reduces_completed_parts():
     assert downtime_metrics["downtime_events"]["press"] == 4
 
 
+def test_arrival_schedule_changes_arrivals_and_queue_shape():
+    line = make_three_stage_line()
+
+    baseline = simulate_production_line(line, 20, 1)
+    surge = simulate_production_line(
+        line,
+        20,
+        1,
+        arrival_schedule=(
+            {"start": 5, "end": 10, "value": 3},
+            {"start": 10, "end": 15, "value": 0},
+        ),
+    )
+
+    assert surge["arrivals"] == baseline["arrivals"] + 5
+    assert surge["arrival_history"][6]["arrivals"] == 3
+    assert surge["arrival_history"][12]["arrivals"] == 0
+    assert surge["max_queue_lengths"]["press"] >= baseline["max_queue_lengths"]["press"]
+
+
+def test_process_time_schedule_creates_temporary_slowdown():
+    no_slowdown_line = ProductionLine(
+        "steady line",
+        [
+            Machine("cutter", 1),
+            Machine("paint", 1),
+            Machine("inspector", 1),
+        ],
+    )
+    line = ProductionLine(
+        "paint slowdown line",
+        [
+            Machine("cutter", 1),
+            Machine(
+                "paint",
+                1,
+                process_time_schedule=(
+                    {"start": 5, "end": 20, "value": 4},
+                ),
+            ),
+            Machine("inspector", 1),
+        ],
+    )
+
+    baseline = simulate_production_line(no_slowdown_line, 30, 1)
+    slowdown = simulate_production_line(line, 30, 1)
+
+    assert slowdown["completed"] < baseline["completed"]
+    assert slowdown["max_queue_lengths"]["paint"] > baseline["max_queue_lengths"]["paint"]
+
+
 def test_simulation_returns_queue_and_completed_history():
     line = make_three_stage_line()
 
@@ -102,6 +153,7 @@ def test_simulation_returns_queue_and_completed_history():
 
     assert len(metrics["queue_history"]) == 5
     assert len(metrics["completed_history"]) == 5
+    assert len(metrics["arrival_history"]) == 5
     assert set(metrics["queue_history"][0]) == {"minute", "cutter", "press", "inspector"}
     assert metrics["completed_history"][-1]["completed"] == metrics["completed"]
 

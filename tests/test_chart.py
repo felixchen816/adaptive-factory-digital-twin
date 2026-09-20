@@ -39,6 +39,9 @@ def test_build_queue_trend_svg_contains_line_chart():
 
     assert svg.startswith("<svg")
     assert "<polyline" in svg
+    assert 'stroke-width="1.6"' in svg
+    assert ">2</text>" in svg
+    assert ">6</text>" in svg
     assert "press queue trend" in svg
 
 

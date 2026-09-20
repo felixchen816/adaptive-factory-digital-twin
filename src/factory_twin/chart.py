@@ -131,14 +131,25 @@ def _build_line_svg(history, values, title_text, width, height):
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
             '<rect width="100%" height="100%" fill="white"/>',
             f'<text x="{margin}" y="24" font-family="Arial" font-size="18">{title}</text>',
-            f'<line x1="{margin}" y1="{height - margin}" x2="{width - margin}" y2="{height - margin}" stroke="#333"/>',
-            f'<line x1="{margin}" y1="{margin}" x2="{margin}" y2="{height - margin}" stroke="#333"/>',
-            f'<polyline fill="none" stroke="#2563eb" stroke-width="3" points="{" ".join(points)}"/>',
+            f'<line x1="{margin}" y1="{height - margin}" x2="{width - margin}" y2="{height - margin}" stroke="#475569" stroke-width="1"/>',
+            f'<line x1="{margin}" y1="{margin}" x2="{margin}" y2="{height - margin}" stroke="#475569" stroke-width="1"/>',
+            f'<line x1="{margin}" y1="{margin}" x2="{width - margin}" y2="{margin}" stroke="#e2e8f0" stroke-width="1"/>',
+            f'<line x1="{margin}" y1="{height / 2:.1f}" x2="{width - margin}" y2="{height / 2:.1f}" stroke="#e2e8f0" stroke-width="1"/>',
+            f'<polyline fill="none" stroke="#2563eb" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" points="{" ".join(points)}"/>',
             f'<text x="{margin}" y="{height - 12}" font-family="Arial" font-size="12">minute</text>',
+            f'<text x="{width - margin - 24}" y="{height - 12}" font-family="Arial" font-size="12">{max_minute}</text>',
             f'<text x="8" y="{margin}" font-family="Arial" font-size="12">queue</text>',
+            f'<text x="8" y="{height - margin}" font-family="Arial" font-size="12">0</text>',
+            f'<text x="8" y="{margin + 14}" font-family="Arial" font-size="12">{_format_axis_value(max_value)}</text>',
             "</svg>",
         ]
     )
+
+
+def _format_axis_value(value):
+    if isinstance(value, float) and not value.is_integer():
+        return f"{value:.1f}"
+    return str(int(value))
 
 
 def _empty_svg(message, width, height):

@@ -38,6 +38,11 @@ def _build_multi_stage_scenario(scenario_definition):
         "arrival_rate",
         1.0,
     )
+    arrival_schedule = _optional_schedule_tuple(
+        scenario_definition,
+        "arrival_schedule",
+        "scenario",
+    )
     improvement_costs = _optional_positive_number_map(
         scenario_definition,
         "improvement_costs",
@@ -62,6 +67,7 @@ def _build_multi_stage_scenario(scenario_definition):
         line=line,
         minutes=minutes,
         arrival_rate=arrival_rate,
+        arrival_schedule=arrival_schedule,
         improvement_costs=improvement_costs,
         improvement_values=improvement_values,
     )
@@ -89,11 +95,17 @@ def _build_machine(machine_definition):
         (),
         "machine",
     )
+    process_time_schedule = _optional_schedule_tuple(
+        machine_definition,
+        "process_time_schedule",
+        "machine",
+    )
     return Machine(
         name=name,
         process_time=process_time,
         parallel_units=parallel_units,
         downtime_minutes=downtime_minutes,
+        process_time_schedule=process_time_schedule,
     )
 
 
@@ -154,6 +166,41 @@ def _optional_non_negative_integer_tuple(data, field_name, default, object_name)
             f"{object_name} {field_name} must be non-negative integers"
         )
     return tuple(value)
+
+
+def _optional_schedule_tuple(data, field_name, object_name):
+    if field_name not in data:
+        return ()
+
+    value = data[field_name]
+    if not isinstance(value, list):
+        raise ValueError(f"{object_name} {field_name} must be schedule windows")
+
+    windows = []
+    for window in value:
+        if not isinstance(window, dict):
+            raise ValueError(f"{object_name} {field_name} must be schedule windows")
+
+        start = window.get("start")
+        end = window.get("end")
+        numeric_value = window.get("value")
+        if not isinstance(start, int) or isinstance(start, bool) or start < 0:
+            raise ValueError(f"{object_name} {field_name} start must be non-negative")
+        if not isinstance(end, int) or isinstance(end, bool) or end <= start:
+            raise ValueError(f"{object_name} {field_name} end must be after start")
+        if not _is_number(numeric_value) or numeric_value < 0:
+            raise ValueError(f"{object_name} {field_name} value must be non-negative")
+        if object_name == "machine" and numeric_value <= 0:
+            raise ValueError(f"{object_name} {field_name} value must be positive")
+
+        windows.append(
+            {
+                "start": start,
+                "end": end,
+                "value": numeric_value,
+            }
+        )
+    return tuple(windows)
 
 
 def _optional_positive_number_map(data, field_name):

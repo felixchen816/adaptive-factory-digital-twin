@@ -25,6 +25,7 @@ class MultiStageScenario:
     line: ProductionLine
     minutes: int = 60
     arrival_rate: float = 1.0
+    arrival_schedule: tuple = ()
     improvement_costs: dict = field(default_factory=dict)
     improvement_values: dict = field(default_factory=dict)
 
@@ -46,6 +47,7 @@ def compare_multi_stage_scenarios(
             scenario.line,
             scenario.minutes,
             scenario.arrival_rate,
+            scenario.arrival_schedule,
         )
 
         final_queues = metrics.get("final_queue_lengths", {})
@@ -84,6 +86,7 @@ def compare_multi_stage_scenarios(
             "downtime_events": metrics["downtime_events"],
             "queue_history": metrics["queue_history"],
             "completed_history": metrics["completed_history"],
+            "arrival_history": metrics["arrival_history"],
             "queue_bottleneck": queue_bottleneck,
             "total_wip": total_wip,
             "largest_final_queue": largest_final_queue,

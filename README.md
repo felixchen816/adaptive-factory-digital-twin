@@ -7,6 +7,8 @@ The project started as a one-machine queue simulator and now includes a
 multi-stage production line with internal queues, bottleneck diagnosis,
 scenario comparison, improvement planning, time-series exports, text charts,
 SVG charts, a static dashboard UI, JSON export, and Markdown reporting.
+It also supports scheduled demand surges, demand lulls, machine downtime, and
+temporary process-time slowdowns for richer queue behavior.
 
 ## What To Run
 
@@ -104,6 +106,7 @@ Important multi-stage metrics:
 - `max_queue_lengths`: largest queue reached at each stage
 - `queue_history`: queue lengths by minute for future charting
 - `completed_history`: cumulative completed parts by minute
+- `arrival_history`: arriving parts by minute and cumulative arrivals
 - `downtime_events`: downtime minutes counted by machine
 - `total_wip`: total work in process left in the line
 - `line_capacity_per_hour`: capacity of the bottleneck machine
@@ -113,6 +116,11 @@ Important multi-stage metrics:
 Machines can define planned downtime with `downtime_minutes`. A machine does
 not process parts during those minutes, which makes it possible to test simple
 failure or maintenance events.
+
+Scenarios can also define `arrival_schedule` windows, and machines can define
+`process_time_schedule` windows. These make it possible to model demand surges,
+demand lulls, temporary slowdowns, and shift-like changes without changing the
+core simulator.
 
 ## Improvement Planning
 
@@ -206,7 +214,9 @@ The repository includes a researched real-world scenario for Tesla Model 3/Y
 production at the Fremont Factory:
 
 - scenario config: `examples/tesla_fremont_model3y_scenario.json`
+- dynamic stress scenario: `examples/tesla_fremont_dynamic_scenario.json`
 - research note: `docs/tesla_fremont_model3y_case_study.md`
+- tool comparison: `docs/simulation_tool_comparison.md`
 
 The scenario uses Tesla public capacity data for California Model 3/Y production
 and models a six-stage vehicle flow: blanking and stamping, rear underbody
@@ -227,6 +237,10 @@ Run it with:
 
 The simulated annualized output is calibrated to land within 1% of the public
 550,000 vehicles/year lower-bound target.
+
+The dynamic stress scenario adds scheduled demand surges, a demand lull,
+temporary casting/final-assembly downtime, and a paint-shop slowdown to create
+more varied queue behavior.
 
 ## Reports and Exports
 
@@ -289,9 +303,15 @@ non-empty `name` and at least one machine. `minutes` defaults to `60`, and
         "name": "press",
         "process_time": 3,
         "parallel_units": 2,
-        "downtime_minutes": [15, 30]
+        "downtime_minutes": [15, 30],
+        "process_time_schedule": [
+          {"start": 60, "end": 120, "value": 4}
+        ]
       },
       {"name": "inspector", "process_time": 2}
+    ],
+    "arrival_schedule": [
+      {"start": 120, "end": 180, "value": 1.5}
     ],
     "improvement_costs": {
       "reduce_process_time": 2,
@@ -317,11 +337,13 @@ Config validation rejects:
 - missing scenario names
 - negative `minutes`
 - negative `arrival_rate`
+- invalid `arrival_schedule`
 - empty machine lists
 - missing machine names
 - missing or non-positive machine `process_time`
 - non-positive machine `parallel_units`
 - non-list or negative machine `downtime_minutes`
+- invalid machine `process_time_schedule`
 - non-object `improvement_costs`
 - non-positive improvement cost values
 - non-object `improvement_values`

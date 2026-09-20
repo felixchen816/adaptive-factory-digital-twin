@@ -25,6 +25,11 @@ TESLA_SCENARIO_ARTIFACTS = [
     "tesla_fremont_model3y_history.csv",
     "tesla_fremont_model3y_queue_chart.svg",
     "tesla_fremont_model3y_dashboard.html",
+    "tesla_fremont_dynamic_results.json",
+    "tesla_fremont_dynamic_report.md",
+    "tesla_fremont_dynamic_history.csv",
+    "tesla_fremont_dynamic_queue_chart.svg",
+    "tesla_fremont_dynamic_dashboard.html",
 ]
 
 
@@ -36,12 +41,14 @@ def main():
     _run([python, "-m", "compileall", "-q", "src", "tests", "examples"])
     _run([python, "examples/run_simple_line.py"])
     _run_real_factory_scenario(python)
+    _run_dynamic_factory_scenario(python)
 
     _verify_artifacts_exist()
     _verify_multi_stage_results()
     _verify_report()
     _verify_dashboard()
     _verify_real_factory_scenario()
+    _verify_dynamic_factory_scenario()
 
     print("Project verification passed.")
 
@@ -74,6 +81,27 @@ def _run_real_factory_scenario(python):
             "tesla_fremont_model3y_queue_chart.svg",
             "--dashboard-html",
             "tesla_fremont_model3y_dashboard.html",
+        ]
+    )
+
+
+def _run_dynamic_factory_scenario(python):
+    _run(
+        [
+            python,
+            "examples/run_simple_line.py",
+            "--multi-stage-config",
+            "examples/tesla_fremont_dynamic_scenario.json",
+            "--multi-stage-json",
+            "tesla_fremont_dynamic_results.json",
+            "--multi-stage-report",
+            "tesla_fremont_dynamic_report.md",
+            "--multi-stage-history-csv",
+            "tesla_fremont_dynamic_history.csv",
+            "--multi-stage-chart-svg",
+            "tesla_fremont_dynamic_queue_chart.svg",
+            "--dashboard-html",
+            "tesla_fremont_dynamic_dashboard.html",
         ]
     )
 
@@ -186,6 +214,50 @@ def _verify_real_factory_scenario():
             "Recommended Improvements",
         ],
         "tesla_fremont_model3y_dashboard.html",
+    )
+
+
+def _verify_dynamic_factory_scenario():
+    metrics_path = REPO_ROOT / "tesla_fremont_dynamic_results.json"
+    metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+    arrival_rates = {
+        row["arrivals"]
+        for row in metrics["arrival_history"]
+    }
+    paint_queues = [
+        row["paint shop"]
+        for row in metrics["queue_history"]
+    ]
+
+    if metrics["scenario"] != "tesla fremont dynamic surge and failure case":
+        raise AssertionError("Dynamic Tesla scenario export used the wrong scenario.")
+    if len(arrival_rates) < 4:
+        raise AssertionError("Dynamic Tesla scenario should include multiple arrival rates.")
+    if max(paint_queues) - min(paint_queues) < 30:
+        raise AssertionError("Dynamic Tesla scenario should create varied paint queues.")
+    if metrics["downtime_events"]["rear underbody casting"] != 10:
+        raise AssertionError("Dynamic Tesla scenario should include casting downtime.")
+    if metrics["downtime_events"]["final assembly and end-of-line test"] != 5:
+        raise AssertionError("Dynamic Tesla scenario should include final assembly downtime.")
+
+    history_header = (REPO_ROOT / "tesla_fremont_dynamic_history.csv").read_text(
+        encoding="utf-8"
+    ).splitlines()[0]
+    _require_text(
+        history_header,
+        ["arrivals", "cumulative_arrivals"],
+        "tesla_fremont_dynamic_history.csv",
+    )
+    _require_text(
+        (REPO_ROOT / "tesla_fremont_dynamic_dashboard.html").read_text(
+            encoding="utf-8"
+        ),
+        [
+            "tesla fremont dynamic surge and failure case",
+            "Decision Snapshot",
+            "paint shop",
+        ],
+        "tesla_fremont_dynamic_dashboard.html",
     )
 
 

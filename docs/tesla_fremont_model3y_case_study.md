@@ -62,6 +62,24 @@ minutes = 10080
 The 10,080-minute run represents seven continuous production days. A longer run
 reduces distortion from initial pipeline fill in a multi-stage line.
 
+The repository also includes a shorter stress scenario:
+
+```text
+examples/tesla_fremont_dynamic_scenario.json
+```
+
+That scenario keeps the same factory stage map but adds:
+
+- morning and late-day demand surges
+- a midday demand lull
+- a temporary casting outage
+- a temporary paint-shop slowdown
+- a final-assembly downtime window
+
+It is designed to produce more varied queue histories than the calibrated
+baseline, so the dashboard charts show queue buildup and recovery instead of
+only smooth linear growth.
+
 ## Modeled Stages
 
 The real factory is much more complex than this model. The scenario compresses

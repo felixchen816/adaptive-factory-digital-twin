@@ -192,6 +192,7 @@ def main(argv=None):
         multi_stage_results["queue_history"],
         multi_stage_results["completed_history"],
         args.multi_stage_history_csv,
+        multi_stage_results.get("arrival_history"),
     )
     print(f"Wrote history to {args.multi_stage_history_csv.name}")
     write_queue_trend_svg(
@@ -256,6 +257,7 @@ def _exportable_multi_stage_metrics(row):
         "downtime_events": row["downtime_events"],
         "queue_history": row["queue_history"],
         "completed_history": row["completed_history"],
+        "arrival_history": row["arrival_history"],
         "queue_bottleneck": row["queue_bottleneck"],
         "recommendation": row["recommendation"],
         "improvement_options": row["improvement_options"],
