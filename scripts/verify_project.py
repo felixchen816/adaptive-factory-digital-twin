@@ -19,6 +19,14 @@ GENERATED_ARTIFACTS = [
     "factory_dashboard.html",
 ]
 
+TESLA_SCENARIO_ARTIFACTS = [
+    "tesla_fremont_model3y_results.json",
+    "tesla_fremont_model3y_report.md",
+    "tesla_fremont_model3y_history.csv",
+    "tesla_fremont_model3y_queue_chart.svg",
+    "tesla_fremont_model3y_dashboard.html",
+]
+
 
 def main():
     """Run tests, compile checks, demo generation, and artifact inspections."""
@@ -27,11 +35,13 @@ def main():
     _run([python, "-m", "pytest", "-q"])
     _run([python, "-m", "compileall", "-q", "src", "tests", "examples"])
     _run([python, "examples/run_simple_line.py"])
+    _run_real_factory_scenario(python)
 
     _verify_artifacts_exist()
     _verify_multi_stage_results()
     _verify_report()
     _verify_dashboard()
+    _verify_real_factory_scenario()
 
     print("Project verification passed.")
 
@@ -47,10 +57,31 @@ def _run(command):
     subprocess.run(command, cwd=REPO_ROOT, check=True)
 
 
+def _run_real_factory_scenario(python):
+    _run(
+        [
+            python,
+            "examples/run_simple_line.py",
+            "--multi-stage-config",
+            "examples/tesla_fremont_model3y_scenario.json",
+            "--multi-stage-json",
+            "tesla_fremont_model3y_results.json",
+            "--multi-stage-report",
+            "tesla_fremont_model3y_report.md",
+            "--multi-stage-history-csv",
+            "tesla_fremont_model3y_history.csv",
+            "--multi-stage-chart-svg",
+            "tesla_fremont_model3y_queue_chart.svg",
+            "--dashboard-html",
+            "tesla_fremont_model3y_dashboard.html",
+        ]
+    )
+
+
 def _verify_artifacts_exist():
     missing = [
         artifact
-        for artifact in GENERATED_ARTIFACTS
+        for artifact in GENERATED_ARTIFACTS + TESLA_SCENARIO_ARTIFACTS
         if not (REPO_ROOT / artifact).exists()
     ]
     if missing:
@@ -114,6 +145,48 @@ def _verify_dashboard():
         "Per-Stage Queue Charts",
     ]
     _require_text(text, required_text, "factory_dashboard.html")
+
+
+def _verify_real_factory_scenario():
+    metrics_path = REPO_ROOT / "tesla_fremont_model3y_results.json"
+    metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+    annualized_output = metrics["throughput_per_hour"] * 24 * 365
+    target_output = 550000
+    relative_error = abs(annualized_output - target_output) / target_output
+
+    if metrics["scenario"] != "tesla fremont model 3/y public-capacity baseline":
+        raise AssertionError("Tesla Fremont scenario export used the wrong scenario.")
+    if relative_error >= 0.01:
+        raise AssertionError(
+            "Tesla Fremont annualized output is not within 1% of 550,000."
+        )
+    if len(metrics["queue_history"]) != 10080:
+        raise AssertionError("Tesla Fremont queue history should cover seven days.")
+
+    report = (REPO_ROOT / "tesla_fremont_model3y_report.md").read_text(
+        encoding="utf-8"
+    )
+    dashboard = (REPO_ROOT / "tesla_fremont_model3y_dashboard.html").read_text(
+        encoding="utf-8"
+    )
+    _require_text(
+        report,
+        [
+            "tesla fremont model 3/y public-capacity baseline",
+            "## Case Study",
+            "## Ranked Improvement Options",
+        ],
+        "tesla_fremont_model3y_report.md",
+    )
+    _require_text(
+        dashboard,
+        [
+            "Decision Snapshot",
+            "tesla fremont model 3/y public-capacity baseline",
+            "Recommended Improvements",
+        ],
+        "tesla_fremont_model3y_dashboard.html",
+    )
 
 
 def _require_text(text, required_text, artifact_name):

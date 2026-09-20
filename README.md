@@ -200,6 +200,34 @@ The best multi-stage scenario is selected by:
 Comparison rows also include `matching_scenario` when an existing scenario
 already reaches or beats the expected result of the recommended improvement.
 
+## Real Factory Scenario
+
+The repository includes a researched real-world scenario for Tesla Model 3/Y
+production at the Fremont Factory:
+
+- scenario config: `examples/tesla_fremont_model3y_scenario.json`
+- research note: `docs/tesla_fremont_model3y_case_study.md`
+
+The scenario uses Tesla public capacity data for California Model 3/Y production
+and models a six-stage vehicle flow: blanking and stamping, rear underbody
+casting, body shop welding, paint, battery / drive-unit marriage, and final
+assembly / end-of-line test.
+
+Run it with:
+
+```bash
+.venv/bin/python examples/run_simple_line.py \
+  --multi-stage-config examples/tesla_fremont_model3y_scenario.json \
+  --multi-stage-json tesla_fremont_model3y_results.json \
+  --multi-stage-report tesla_fremont_model3y_report.md \
+  --multi-stage-history-csv tesla_fremont_model3y_history.csv \
+  --multi-stage-chart-svg tesla_fremont_model3y_queue_chart.svg \
+  --dashboard-html tesla_fremont_model3y_dashboard.html
+```
+
+The simulated annualized output is calibrated to land within 1% of the public
+550,000 vehicles/year lower-bound target.
+
 ## Reports and Exports
 
 The demo generates these local output files:

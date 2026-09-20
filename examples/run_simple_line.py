@@ -183,38 +183,20 @@ def main(argv=None):
     write_dashboard_html(ms_rows, best_multi_stage, args.dashboard_html)
     print(f"Wrote dashboard to {args.dashboard_html.name}")
 
-    # Build multi-stage export dictionary matching expected schema
-    multi_stage_results = {
-        "line": THREE_STAGE_LINE.name,
-        "completed": multi_stage_metrics["completed"],
-        "arrivals": multi_stage_metrics.get("arrivals", 60),
-        "throughput_per_hour": float(multi_stage_metrics["completed"]),
-        "bottleneck_machine": THREE_STAGE_LINE.bottleneck_machine.name,
-        "line_capacity_per_hour": float(THREE_STAGE_LINE.capacity_per_hour),
-        "final_queue_lengths": final_queues,
-        "max_queue_lengths": multi_stage_metrics["max_queue_lengths"],
-        "total_wip": sum(final_queues.values()),
-        "downtime_events": multi_stage_metrics["downtime_events"],
-        "queue_history": multi_stage_metrics["queue_history"],
-        "completed_history": multi_stage_metrics["completed_history"],
-        "queue_bottleneck": queue_bottleneck,
-        "recommendation": line_recommendation,
-        "improvement_options": improvement_options,
-        "best_improvement": best_improvement,
-    }
+    multi_stage_results = _exportable_multi_stage_metrics(best_multi_stage)
 
     # Save multi-stage results JSON
     write_metrics_to_json(multi_stage_results, args.multi_stage_json)
     print(f"\nWrote results to {args.multi_stage_json.name}")
     write_time_series_to_csv(
-        multi_stage_metrics["queue_history"],
-        multi_stage_metrics["completed_history"],
+        multi_stage_results["queue_history"],
+        multi_stage_results["completed_history"],
         args.multi_stage_history_csv,
     )
     print(f"Wrote history to {args.multi_stage_history_csv.name}")
     write_queue_trend_svg(
-        multi_stage_metrics["queue_history"],
-        queue_bottleneck,
+        multi_stage_results["queue_history"],
+        multi_stage_results["queue_bottleneck"],
         args.multi_stage_chart_svg,
     )
     print(f"Wrote chart to {args.multi_stage_chart_svg.name}")
@@ -257,6 +239,29 @@ def _best_improvement_summary(row):
         f"(gain={best_improvement['completed_gain']}, "
         f"benefit/cost={best_improvement['benefit_per_cost']:.2f})"
     )
+
+
+def _exportable_multi_stage_metrics(row):
+    return {
+        "scenario": row["scenario"],
+        "completed": row["completed"],
+        "arrivals": row["arrivals"],
+        "throughput_per_hour": row["throughput_per_hour"],
+        "completion_rate": row["completion_rate"],
+        "bottleneck_machine": row["bottleneck_machine"],
+        "line_capacity_per_hour": row["line_capacity_per_hour"],
+        "final_queue_lengths": row["final_queue_lengths"],
+        "max_queue_lengths": row["max_queue_lengths"],
+        "total_wip": row["total_wip"],
+        "downtime_events": row["downtime_events"],
+        "queue_history": row["queue_history"],
+        "completed_history": row["completed_history"],
+        "queue_bottleneck": row["queue_bottleneck"],
+        "recommendation": row["recommendation"],
+        "improvement_options": row["improvement_options"],
+        "best_improvement": row["best_improvement"],
+        "matching_scenario": row.get("matching_scenario"),
+    }
 
 
 if __name__ == "__main__":

@@ -61,6 +61,7 @@ def test_example_accepts_config_and_output_paths(tmp_path):
     assert "custom baseline" in multi_stage_report.read_text(encoding="utf-8")
 
     exported_metrics = json.loads(multi_stage_json.read_text(encoding="utf-8"))
+    assert exported_metrics["scenario"] == "custom baseline"
     assert exported_metrics["best_improvement"]["target"] == "press"
     assert exported_metrics["best_improvement"]["completed_gain"] > 0
     assert len(exported_metrics["queue_history"]) == 60

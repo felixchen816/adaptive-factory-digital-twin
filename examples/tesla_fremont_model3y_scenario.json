@@ -1,0 +1,47 @@
+[
+  {
+    "name": "tesla fremont model 3/y public-capacity baseline",
+    "minutes": 10080,
+    "arrival_rate": 1.0464231354642313,
+    "machines": [
+      {
+        "name": "blanking and stamping",
+        "process_time": 5,
+        "parallel_units": 10
+      },
+      {
+        "name": "rear underbody casting",
+        "process_time": 10,
+        "parallel_units": 11
+      },
+      {
+        "name": "body shop welding",
+        "process_time": 10,
+        "parallel_units": 11
+      },
+      {
+        "name": "paint shop",
+        "process_time": 10,
+        "parallel_units": 11
+      },
+      {
+        "name": "battery and drive-unit marriage",
+        "process_time": 10,
+        "parallel_units": 11
+      },
+      {
+        "name": "final assembly and end-of-line test",
+        "process_time": 10,
+        "parallel_units": 11
+      }
+    ],
+    "improvement_costs": {
+      "reduce_process_time": 8,
+      "add_parallel_capacity": 15,
+      "reduce_arrivals": 1
+    },
+    "improvement_values": {
+      "completed_part": 45000
+    }
+  }
+]
