@@ -156,9 +156,10 @@ The demo generates `factory_dashboard.html`, a self-contained static dashboard
 for the multi-stage scenarios. It shows:
 
 - high-level summary metrics
+- decision snapshot with selected scenario, bottleneck, recommendation, and completion rate
 - executive summary
 - model assumptions and limitations
-- scenario comparison table
+- scenario comparison table with the best scenario highlighted
 - recommended improvement table
 - matching scenario results
 - embedded SVG queue trend charts

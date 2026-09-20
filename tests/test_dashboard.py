@@ -58,6 +58,11 @@ def test_build_dashboard_html_contains_summary_and_chart():
     assert "faster press" in html
     assert "Improve press by reducing process time." in html
     assert "<svg" in html
+    assert "Decision Snapshot" in html
+    assert "Selected scenario" in html
+    assert "Primary bottleneck" in html
+    assert "Recommended action" in html
+    assert 'class="row-best"' in html
     assert "Executive Summary" in html
     assert "Model Assumptions" in html
     assert "Arrivals use a fixed average rate" in html

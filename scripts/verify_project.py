@@ -100,6 +100,10 @@ def _verify_dashboard():
     text = (REPO_ROOT / "factory_dashboard.html").read_text(encoding="utf-8")
     required_text = [
         "Adaptive Factory Digital Twin",
+        "Decision Snapshot",
+        "Selected scenario",
+        "Primary bottleneck",
+        "Recommended action",
         "Executive Summary",
         "Model Assumptions",
         "Limitations",

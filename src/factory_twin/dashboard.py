@@ -34,6 +34,7 @@ def build_dashboard_html(rows, best):
             "<div>",
             "<p>Factory Simulation Dashboard</p>",
             "<h1>Adaptive Factory Digital Twin</h1>",
+            "<span>Scenario comparison, bottleneck diagnosis, and improvement planning.</span>",
             "</div>",
             f'<strong class="status">Best Scenario: {escape(best_name)}</strong>',
             "</section>",
@@ -42,6 +43,10 @@ def build_dashboard_html(rows, best):
             _metric("Best Completed", best_completed),
             _metric("Best Total WIP", _format_number(best_wip)),
             _metric("Best Completion Rate", _format_percent(best.get("completion_rate", 0) if best else 0)),
+            "</section>",
+            '<section class="decision-band">',
+            "<h2>Decision Snapshot</h2>",
+            _decision_snapshot(best),
             "</section>",
             '<section class="panel">',
             "<h2>Executive Summary</h2>",
@@ -59,7 +64,7 @@ def build_dashboard_html(rows, best):
             "</section>",
             '<section class="panel">',
             "<h2>Scenario Comparison</h2>",
-            _comparison_table(scenario_rows),
+            _comparison_table(scenario_rows, best_name),
             "</section>",
             '<section class="panel">',
             "<h2>Recommended Improvements</h2>",
@@ -100,11 +105,12 @@ def write_dashboard_html(rows, best, output_path):
     output_path.write_text(build_dashboard_html(rows, best), encoding="utf-8")
 
 
-def _comparison_table(rows):
+def _comparison_table(rows, best_name):
     body = []
     for row in rows:
+        best_class = ' class="row-best"' if row["scenario"] == best_name else ""
         body.append(
-            "<tr>"
+            f"<tr{best_class}>"
             f"<td>{escape(row['scenario'])}</td>"
             f"<td>{row['completed']}</td>"
             f"<td>{_format_percent(row['completion_rate'])}</td>"
@@ -181,6 +187,29 @@ def _executive_summary(rows, best):
     )
 
 
+def _decision_snapshot(best):
+    if not best:
+        return "<p>No scenario data available.</p>"
+
+    best_improvement = best.get("best_improvement") or {}
+    items = [
+        ("Selected scenario", best["scenario"]),
+        ("Primary bottleneck", best["queue_bottleneck"]),
+        ("Recommended action", best_improvement.get("summary", "No change needed.")),
+        ("Completion rate", _format_percent(best["completion_rate"])),
+    ]
+    return "".join(_decision_item(label, value) for label, value in items)
+
+
+def _decision_item(label, value):
+    return (
+        '<div class="decision-item">'
+        f"<span>{escape(str(label))}</span>"
+        f"<strong>{escape(str(value))}</strong>"
+        "</div>"
+    )
+
+
 def _assumptions_list():
     assumptions = [
         "Arrivals use a fixed average rate during the simulation window.",
@@ -254,28 +283,37 @@ def _styles():
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  color: #182026;
-  background: #f4f7f8;
+  color: #172026;
+  background: #eef3f4;
   font-family: Arial, Helvetica, sans-serif;
 }
 .shell {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 32px 0;
+  padding: 28px 0 40px;
 }
 .header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  padding: 24px 0;
-  border-bottom: 2px solid #1f6f78;
+  padding: 24px;
+  border: 1px solid #cad7da;
+  border-left: 6px solid #1f6f78;
+  border-radius: 8px;
+  background: #ffffff;
 }
 .header p {
   margin: 0 0 8px;
   color: #6b7280;
   font-size: 14px;
   text-transform: uppercase;
+}
+.header span {
+  display: block;
+  margin-top: 10px;
+  color: #52616b;
+  line-height: 1.5;
 }
 h1 {
   margin: 0;
@@ -291,7 +329,8 @@ h2 {
   border: 1px solid #1f6f78;
   border-radius: 8px;
   color: #1f6f78;
-  background: #ffffff;
+  background: #edf8f9;
+  white-space: nowrap;
 }
 .metrics {
   display: grid;
@@ -301,10 +340,12 @@ h2 {
 }
 .metric,
 .panel,
-.chart-panel {
+.chart-panel,
+.decision-band {
   border: 1px solid #d7dee2;
   border-radius: 8px;
   background: #ffffff;
+  box-shadow: 0 8px 24px rgba(32, 49, 57, 0.06);
 }
 .metric {
   padding: 16px;
@@ -318,6 +359,35 @@ h2 {
   display: block;
   margin-top: 8px;
   font-size: 24px;
+}
+.decision-band {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.decision-band h2 {
+  grid-column: 1 / -1;
+  margin-bottom: 4px;
+}
+.decision-item {
+  min-height: 96px;
+  padding: 14px;
+  border: 1px solid #d9e3e6;
+  border-radius: 8px;
+  background: #f8fbfb;
+}
+.decision-item span {
+  display: block;
+  color: #667085;
+  font-size: 13px;
+}
+.decision-item strong {
+  display: block;
+  margin-top: 8px;
+  color: #172026;
+  line-height: 1.35;
 }
 .panel {
   margin-top: 16px;
@@ -352,7 +422,16 @@ td {
 }
 th {
   color: #45515c;
+  background: #f5f8f8;
   font-size: 13px;
+}
+tr.row-best td {
+  background: #f0f8f5;
+  border-bottom-color: #b9d8c8;
+}
+tr.row-best td:first-child {
+  border-left: 4px solid #2e7d56;
+  font-weight: 700;
 }
 .chart-grid {
   display: grid;
@@ -389,8 +468,12 @@ th {
   }
   .metrics,
   .chart-grid,
-  .two-column {
+  .two-column,
+  .decision-band {
     grid-template-columns: 1fr;
+  }
+  .decision-band h2 {
+    grid-column: auto;
   }
   h1 {
     font-size: 28px;
